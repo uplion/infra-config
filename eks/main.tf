@@ -51,7 +51,7 @@ data "aws_eks_cluster_auth" "main" {
 ################################################################################
 
 locals {
-  cluster_sg_name   = coalesce(var.cluster_security_group_name, "${var.cluster_name}-cluster")
+  cluster_sg_name = coalesce(var.cluster_security_group_name, "${var.cluster_name}-cluster")
 
   cluster_security_group_id = aws_security_group.cluster.id
 
@@ -89,7 +89,7 @@ resource "aws_security_group_rule" "cluster" {
   for_each = { for k, v in merge(
     local.cluster_security_group_rules,
     var.cluster_security_group_additional_rules
-  ) : k => v}
+  ) : k => v }
 
   # Required
   security_group_id = aws_security_group.cluster.id
@@ -114,7 +114,7 @@ resource "aws_security_group_rule" "cluster" {
 ################################################################################
 
 locals {
-  node_sg_name   = coalesce(var.node_security_group_name, "${var.cluster_name}-node")
+  node_sg_name = coalesce(var.node_security_group_name, "${var.cluster_name}-node")
 
   node_security_group_id = aws_security_group.node.id
 
