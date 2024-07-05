@@ -24,7 +24,7 @@ or paste credentials in `~/aws/credentials` file.
 If you are using the AWS Academy Learner Lab, I assume you have a role called `LabRole` that has the required permissions. So you can save the role ARN in `terraform.tfvars` with the following command:
 
 ```bash
-echo "role_arn = `aws iam get-role --role-name LabRole | jq -r .Role.Arn`" | tee terraform.tfvars
+echo "role_arn = \"`aws iam get-role --role-name LabRole | jq -r .Role.Arn`\"" | tee terraform.tfvars
 ```
 
 or you can get the role ARN from the AWS console (search IAM -> Roles -> LabRole -> Copy ARN) and paste it in the `terraform.tfvars` file.
