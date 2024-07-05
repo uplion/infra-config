@@ -1,4 +1,4 @@
-# cluster-config
+# infra-config
 
 ## How to use
 
