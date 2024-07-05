@@ -12,9 +12,18 @@
 
 If you are using the AWS Academy Learner Lab, I assume you have a role called `LabRole` that has the required permissions. So you can save the role ARN in `terraform.tfvars` with the following command:
 
+Bash:
 ```bash
 echo "role_arn = `aws iam get-role --role-name LabRole | jq -r .Role.Arn`" | tee terraform.tfvars
 ```
+
+Powershell:
+```powershell
+echo "role_arn = `"$(aws iam get-role --role-name LabRole | jq -r .Role.Arn)`"" | tee terraform.tfvars
+```
+    
+`
+
 Otherwise, you need to create a role with `AmazonEC2ContainerRegistryReadOnly`, `AmazonEKSClusterPolicy`, `AmazonEKSWorkerNodePolicy` and `AmazonSSMManagedInstanceCore`. Then run the above command with the role name you created.
 
 ### Deploy
