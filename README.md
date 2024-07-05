@@ -23,3 +23,11 @@ Otherwise, you need to create a role with `AmazonEC2ContainerRegistryReadOnly`, 
 terraform init
 terraform apply -auto-approve
 ```
+
+### Destroy
+
+Destroy the resources to avoid unnecessary charges.
+
+```bash
+terraform destroy -auto-approve
+```
