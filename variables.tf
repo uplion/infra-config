@@ -14,26 +14,3 @@ variable "cluster_name" {
   type        = string
   default     = "eks-cluster"
 }
-
-variable "cluster_version" {
-  description = "The desired Kubernetes version for creating the EKS cluster."
-  type        = string
-  default     = "1.30"
-}
-
-variable "cluster_addons" {
-  description = "Map of cluster addon configurations to enable for the cluster. Addon name can be the map keys or set with `name`"
-  type        = any
-  default = {
-    coredns                = {}
-    eks-pod-identity-agent = {}
-    kube-proxy             = {}
-    vpc-cni                = {}
-  }
-}
-
-variable "cluster_addons_timeouts" {
-  description = "Create, update, and delete timeout configurations for the cluster addons"
-  type        = map(string)
-  default     = {}
-}
