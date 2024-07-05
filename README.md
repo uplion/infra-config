@@ -14,7 +14,7 @@
 aws configure
 ```
 
-or paste credentials in `~/aws/credentials` file.
+or paste credentials in `~/.aws/credentials` file.
 
 
 ### Get `role_arn`
