@@ -83,7 +83,7 @@ export INGRESS_HOST=$(kubectl -n istio-ingress get service istio-ingress -o json
 
 Send 100 requests to the application:
 ```sh
-for i in $(seq 1 100); do curl -s -o /dev/null "http://$INGRESS_HOST/productpage"; done
+for i in $(seq 1 100); do curl -s -o /dev/null "http://$INGRESS_HOST/productpage" ; done
 ```
 
 Then, start the Kiali dashboard:
