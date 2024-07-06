@@ -3,6 +3,12 @@ variable "role_arn" {
   type        = string
 }
 
+variable "redis_cluster_password" {
+    description = "The password for the Redis cluster."
+    type        = string
+    default     = "123456"
+}
+
 variable "region" {
   description = "The AWS region to deploy the EKS cluster."
   type        = string

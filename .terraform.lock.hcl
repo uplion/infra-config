@@ -31,6 +31,7 @@ provider "registry.terraform.io/hashicorp/helm" {
   constraints = ">= 2.9.0"
   hashes = [
     "h1:MCwlHF214XoAqJ11wR1SQuZmjJyAagKOqgSzl9hHrPg=",
+    "h1:QHpOJbeU6V8Qt6YFRWkQ7/kttJu8cN3egyG7TImZEKw=",
     "zh:087a475fda3649e4b6b9aeb5f21704972f5d85c10d0bf334289b0a1b8c1a5575",
     "zh:1877991d976491d4e2a653a89491bd3b92123a00f442f15aa62caea8902677c7",
     "zh:233d9e550b900be8bbf62871322964239bb4827b3500b77d7e2652a8bae6a106",
@@ -72,6 +73,7 @@ provider "registry.terraform.io/hashicorp/time" {
   version     = "0.11.2"
   constraints = ">= 0.9.0"
   hashes = [
+    "h1:FVyFc0JtobHmEha0xXeT76XPkhGb62r1Mk709kcwp+w=",
     "h1:bC4b7n4g30ciIn5w6b66mXSTIo2CH6XQbp+gBdDvlYs=",
     "zh:02588b5b8ba5d31e86d93edc93b306bcbf47c789f576769245968cc157a9e8c5",
     "zh:088a30c23796133678d1d6614da5cf5544430570408a17062288b58c0bd67ac8",
