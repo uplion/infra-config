@@ -8,6 +8,11 @@ output "cluster_name" {
   description = "The name of the EKS cluster."
 }
 
+output "cluster_id" {
+  value = aws_eks_cluster.main.id
+  description = "The unique identifier for the EKS cluster."
+}
+
 output "cluster_version" {
   value       = aws_eks_cluster.main.version
   description = "The desired Kubernetes version for creating the EKS cluster."

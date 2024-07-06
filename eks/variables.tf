@@ -20,6 +20,7 @@ variable "cluster_name" {
   default     = "eks-cluster"
 }
 
+
 variable "cluster_version" {
   description = "The desired Kubernetes version for creating the EKS cluster."
   type        = string

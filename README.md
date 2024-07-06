@@ -4,9 +4,11 @@
 
 ### Prerequisites
 
+You must have the following tools installed and available in your `PATH`:
+
 - [terraform](https://developer.hashicorp.com/terraform/install)
-- [aws-cli](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
-- [kubectl](https://kubernetes.io/docs/tasks/tools/) - If you want to interact with the cluster
+- [aws-cli](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) - `aws` command
+- [kubectl](https://kubernetes.io/docs/tasks/tools/)
 
 ### Configure AWS credentials
 
