@@ -5,8 +5,13 @@
 ### Prerequisites
 
 - [terraform](https://developer.hashicorp.com/terraform/install)
+    - could be installed by `winget` or `choco`
 - [aws-cli](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
 - [kubectl](https://kubernetes.io/docs/tasks/tools/) - If you want to interact with the cluster
+- [jq](https://jqlang.github.io/jq/) - If you are using the AWS Academy Learner Lab & get the `role_arn` by command line
+    - could be installed by `winget` or `choco`
+- [helm](https://helm.sh/zh/docs/intro/quickstart/)
+    - could be installed by `winget` or `choco`
 
 ### Configure AWS credentials
 
