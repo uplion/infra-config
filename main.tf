@@ -17,6 +17,8 @@ provider "helm" {
   }
 }
 
+provider "random" {}
+
 
 locals {
   tags = {
@@ -70,10 +72,15 @@ module "eks" {
 }
 
 ################################################################################
-# Helm
+# Redis
 ################################################################################
 
-module "eks_blueprints_addons" {
+resource "random_password" "redis" {
+  length  = 16
+  special = true
+}
+
+module "redis" {
   source  = "aws-ia/eks-blueprints-addons/aws"
   version = "~> 1.16"
 
@@ -84,16 +91,16 @@ module "eks_blueprints_addons" {
 
   helm_releases = {
     redis-cluster = {
-        chart               = "redis-cluster"
-        chart_version       = "10.2.6"
-        repository          = "https://charts.bitnami.com/bitnami"
-        name                = "redis-cluster"
-        namespace           = "redis-cluster" # per
-        create_namespace    = true
-        set = [{
-            name = "password"
-            value = var.redis_cluster_password
-        }]
+      chart            = "redis-cluster"
+      chart_version    = "10.2.6"
+      repository       = "https://charts.bitnami.com/bitnami"
+      name             = "redis-cluster"
+      namespace        = "redis-cluster"
+      create_namespace = true
+      set = [{
+        name  = "password"
+        value = random_password.redis.result
+      }]
     }
   }
 }

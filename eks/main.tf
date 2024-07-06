@@ -55,9 +55,6 @@ resource "aws_eks_node_group" "main" {
 
   instance_types = ["t3.medium"]
 
-  timeouts {
-    delete = "20m"
-  }
 }
 
 data "aws_eks_cluster_auth" "main" {
