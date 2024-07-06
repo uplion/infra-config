@@ -160,3 +160,9 @@ variable "cluster_security_group_tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "disabled_istio_addons" {
+  description = "List of Istio addons to disable"
+  type        = list(string)
+  default     = []
+}

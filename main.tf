@@ -68,3 +68,10 @@ module "eks" {
   }
 
 }
+
+resource "helm_release" "example" {
+  name  = "bookinfo"
+  chart = "./charts/bookinfo"
+
+  depends_on = [module.eks]
+}

@@ -388,9 +388,9 @@ locals {
 }
 resource "null_resource" "cli_connect_cluster" {
   triggers = {
-    cluster_id = aws_eks_cluster.main.id
+    cluster_id   = aws_eks_cluster.main.id
     cluster_name = aws_eks_cluster.main.name
-    region = var.region
+    region       = var.region
   }
 
   depends_on = [
@@ -404,9 +404,9 @@ resource "null_resource" "cli_connect_cluster" {
 
 resource "null_resource" "label_default_namespace" {
   triggers = {
-    cluster_id = aws_eks_cluster.main.id
+    cluster_id   = aws_eks_cluster.main.id
     cluster_name = aws_eks_cluster.main.name
-    region = var.region
+    region       = var.region
   }
 
   depends_on = [
@@ -424,6 +424,8 @@ resource "kubernetes_namespace" "istio_system" {
   metadata {
     name = "istio-system"
   }
+
+  depends_on = [aws_eks_cluster.main, aws_eks_node_group.main]
 }
 
 module "eks_blueprints_addons" {
@@ -482,13 +484,15 @@ module "eks_blueprints_addons" {
       ]
     }
   }
+
+  depends_on = [kubernetes_namespace.istio_system]
 }
 
 resource "null_resource" "restart_istio_ingress" {
   triggers = {
-    cluster_id = aws_eks_cluster.main.id
+    cluster_id   = aws_eks_cluster.main.id
     cluster_name = aws_eks_cluster.main.name
-    region = var.region
+    region       = var.region
   }
 
   depends_on = [
@@ -507,3 +511,12 @@ resource "null_resource" "restart_istio_ingress" {
 # Istio Observability Add-ons
 ################################################################################
 
+resource "helm_release" "istio_addons" {
+  name         = "istio-addons"
+  chart        = "${path.module}/istio_addons"
+  force_update = true
+
+  depends_on = [
+    kubernetes_namespace.istio_system
+  ]
+}

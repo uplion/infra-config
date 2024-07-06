@@ -60,3 +60,35 @@ Destroy the resources to avoid unnecessary charges.
 ```bash
 terraform destroy -auto-approve
 ```
+
+## Example Application
+
+Switch to the `bookinfo` branch:
+```sh
+git checkout origin/bookinfo
+```
+
+Deploy using the following commands:
+```sh
+terraform init
+terraform apply -auto-approve
+```
+
+After a successful deployment, the example application should be running normally.
+
+Export the `INGRESS_HOST` variable:
+```sh
+export INGRESS_HOST=$(kubectl -n istio-ingress get service istio-ingress -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+```
+
+Send 100 requests to the application:
+```sh
+for i in $(seq 1 100); do curl -s -o /dev/null "http://$INGRESS_HOST/productpage"; done
+```
+
+Then, start the Kiali dashboard:
+```sh
+istioctl dashboard kiali
+```
+
+You should see the traffic graph in the Kiali dashboard.

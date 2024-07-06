@@ -9,7 +9,7 @@ output "cluster_name" {
 }
 
 output "cluster_id" {
-  value = aws_eks_cluster.main.id
+  value       = aws_eks_cluster.main.id
   description = "The unique identifier for the EKS cluster."
 }
 
