@@ -422,7 +422,17 @@ resource "kubernetes_namespace" "istio_system" {
     name = "istio-system"
   }
 
-  depends_on = [aws_eks_cluster.main, aws_eks_node_group.main]
+  depends_on = [
+    aws_eks_cluster.main,
+    aws_eks_node_group.main,
+    aws_eks_addon.before_compute,
+    aws_eks_addon.main,
+    module.vpc,
+    aws_security_group.cluster,
+    aws_security_group.node,
+    aws_security_group_rule.cluster,
+    aws_security_group_rule.node
+  ]
 }
 
 module "eks_blueprints_addons" {
