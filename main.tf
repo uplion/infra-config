@@ -111,10 +111,10 @@ module "eks_blueprints_addons" {
         name                = "redis-cluster"
         namespace           = "redis-cluster" # per
         create_namespace    = true
-        # set = [{
-        #     name = "password"
-        #     value = var.redis_cluster_password
-        # }]
+        set = [{
+            name = "password"
+            value = var.redis_cluster_password
+        }]
     }
 
     # istio
