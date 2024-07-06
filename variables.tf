@@ -4,9 +4,9 @@ variable "role_arn" {
 }
 
 variable "redis_cluster_password" {
-    description = "The password for the Redis cluster."
-    type        = string
-    default     = "123456"
+  description = "The password for the Redis cluster."
+  type        = string
+  default     = "123456"
 }
 
 variable "region" {
