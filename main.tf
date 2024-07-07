@@ -21,14 +21,6 @@ provider "random" {}
 
 
 locals {
-<<<<<<< HEAD
-  vpc_cidr = "10.0.0.0/16"
-
-  istio_chart_url     = "https://istio-release.storage.googleapis.com/charts"
-  istio_chart_version = "1.20.2"
-
-=======
->>>>>>> 27a1e1b0d99aa1229ed4ef8d6c566fc780c7bcbf
   tags = {
     GithubRepo = "github.com/uplion/infra-config"
   }
