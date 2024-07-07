@@ -14,15 +14,7 @@ resource "kubernetes_persistent_volume" "pv" {
     }
 
     access_modes = ["ReadWriteOnce"] # 设置访问模式
-    persistent_volume_source {
-      host_path = {
-        path = "${var.host_path}_${count.index + 1}"
-      }
-    }
+    persistent_volume_source {}
     persistent_volume_reclaim_policy = "Retain" # 设置回收策略
-    claim_ref = {
-      name      = "pvc-${count.index + 1}"
-      namespace = "default"
-    }
   }
 }
