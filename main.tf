@@ -77,17 +77,17 @@ module "eks" {
 
 # module redis {
 #     source = "./redis-cluster"
-    
+
 #     node_count     = 6
 #     replica_count  = 1
 #     storage_class  = "gp2"
 #     storage_size   = "1Gi"
-    
+
 #     pv_name_prefix = "redis-cluster"
 #     pv_labels      = {
 #         app = "redis-cluster"
 #     }
-    
+
 #     name      = "redis-cluster"
 #     namespace = "redis-cluster"
 # }
