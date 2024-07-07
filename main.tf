@@ -75,32 +75,19 @@ module "eks" {
 # Redis
 ################################################################################
 
-resource "random_password" "redis" {
-  length  = 16
-  special = true
-}
-
-module "redis" {
-  source  = "aws-ia/eks-blueprints-addons/aws"
-  version = "~> 1.16"
-
-  cluster_name      = module.eks.cluster_name
-  cluster_endpoint  = module.eks.cluster_endpoint
-  cluster_version   = module.eks.cluster_version
-  oidc_provider_arn = var.role_arn
-
-  helm_releases = {
-    redis-cluster = {
-      chart            = "redis-cluster"
-      chart_version    = "10.2.6"
-      repository       = "https://charts.bitnami.com/bitnami"
-      name             = "redis-cluster"
-      namespace        = "redis-cluster"
-      create_namespace = true
-      set = [{
-        name  = "password"
-        value = random_password.redis.result
-      }]
-    }
-  }
-}
+# module redis {
+#     source = "./redis-cluster"
+    
+#     node_count     = 6
+#     replica_count  = 1
+#     storage_class  = "gp2"
+#     storage_size   = "1Gi"
+    
+#     pv_name_prefix = "redis-cluster"
+#     pv_labels      = {
+#         app = "redis-cluster"
+#     }
+    
+#     name      = "redis-cluster"
+#     namespace = "redis-cluster"
+# }

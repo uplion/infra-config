@@ -1,47 +1,42 @@
-
-locals{
-  redis_cluster_chart_url       = "https://charts.bitnami.com/bitnami"
-  redis_cluster_chart_version   = "10.2.6"
-  
-  pv_labels = {
-    app = "redis-cluster"
-  }
+resource "random_password" "redis" {
+  length  = 16
+  special = true
 }
 
 module "pv" {
-    source = "../pv"
+    source = "./pv"
 
     pv_count = 6
-    storage_class = "standard"
-    storage = "1Gi"
+    storage_class = var.storage_class
+    storage = var.storage_size
 
     pv_name_prefix = "redis-cluster"
-    pv_labels = local.pv_labels
+    pv_labels = var.pv_labels
 }
 
 resource "helm_release" "redis-cluster" {
-    name                = "redis-cluster"
-    repository          = local.redis_cluster_chart_url
+    name                = var.name
+    repository          = "https://charts.bitnami.com/bitnami"
     chart               = "redis-cluster"
-    version             = local.redis_cluster_chart_version
+    version             = "10.2.6"
 
-    namespace           = "redis-cluster" # per
+    namespace           = var.namespace # per
     create_namespace    = true
 
     values = [
         yamlencode(
             {
                 cluster = {
-                    nodes       = 6
-                    replicas    = 1
+                    nodes       = var.node_count
+                    replicas    = var.replica_count
                 }
                 persistence = {
-                    storageClass = "standard"
+                    storageClass = var.storage_class
                     accessModes = ["ReadWriteOnce"]
-                    size = "1Gi"
+                    size = var.storage_size
                     matchLabels = local.pv_labels
                 }
-                password = "123456"
+                password = random_password.redis.result
             }
         )
     ]
