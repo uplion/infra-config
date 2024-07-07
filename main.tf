@@ -17,13 +17,18 @@ provider "helm" {
   }
 }
 
+provider "random" {}
+
 
 locals {
+<<<<<<< HEAD
   vpc_cidr = "10.0.0.0/16"
 
   istio_chart_url     = "https://istio-release.storage.googleapis.com/charts"
   istio_chart_version = "1.20.2"
 
+=======
+>>>>>>> 27a1e1b0d99aa1229ed4ef8d6c566fc780c7bcbf
   tags = {
     GithubRepo = "github.com/uplion/infra-config"
   }
@@ -75,73 +80,35 @@ module "eks" {
 }
 
 ################################################################################
-# EKS Blueprints Addons
+# Redis
 ################################################################################
 
-resource "kubernetes_namespace_v1" "istio_system" {
-  metadata {
-    name = "istio-system"
-  }
+resource "random_password" "redis" {
+  length  = 16
+  special = true
 }
 
-module "eks_blueprints_addons" {
+module "redis" {
   source  = "aws-ia/eks-blueprints-addons/aws"
   version = "~> 1.16"
-
 
   cluster_name      = module.eks.cluster_name
   cluster_endpoint  = module.eks.cluster_endpoint
   cluster_version   = module.eks.cluster_version
   oidc_provider_arn = var.role_arn
 
-  # Due to the lack of permissions to create IAM roles
-  # it is not possible to use the aws-ia/eks-blueprints-addons/aws to create the aws_load_balancer_controller.
-
   helm_releases = {
-
-    # istio
-    istio-base = {
-      chart         = "base"
-      chart_version = local.istio_chart_version
-      repository    = local.istio_chart_url
-      name          = "istio-base"
-      namespace     = kubernetes_namespace_v1.istio_system.metadata[0].name
-    }
-
-    istiod = {
-      chart         = "istiod"
-      chart_version = local.istio_chart_version
-      repository    = local.istio_chart_url
-      name          = "istiod"
-      namespace     = kubernetes_namespace_v1.istio_system.metadata[0].name
-
-      set = [
-        {
-          name  = "meshConfig.accessLogFile"
-          value = "/dev/stdout"
-        }
-      ]
-    }
-
-    istio-ingress = {
-      chart            = "gateway"
-      chart_version    = local.istio_chart_version
-      repository       = local.istio_chart_url
-      name             = "istio-ingress"
-      namespace        = "istio-ingress" # per https://github.com/istio/istio/blob/master/manifests/charts/gateways/istio-ingress/values.yaml#L2
+    redis-cluster = {
+      chart            = "redis-cluster"
+      chart_version    = "10.2.6"
+      repository       = "https://charts.bitnami.com/bitnami"
+      name             = "redis-cluster"
+      namespace        = "redis-cluster"
       create_namespace = true
-
-      values = [
-        yamlencode(
-          {
-            labels = {
-              istio = "ingressgateway"
-            }
-          }
-        )
-      ]
+      set = [{
+        name  = "password"
+        value = random_password.redis.result
+      }]
     }
   }
-
-  tags = local.tags
 }

@@ -4,9 +4,11 @@
 
 ### Prerequisites
 
+You must have the following tools installed and available in your `PATH`:
+
 - [terraform](https://developer.hashicorp.com/terraform/install)
     - could be installed by `winget` or `choco`
-- [aws-cli](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
+- [aws-cli](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) - `aws` command
 - [kubectl](https://kubernetes.io/docs/tasks/tools/) - If you want to interact with the cluster
 - [jq](https://jqlang.github.io/jq/) - If you are using the AWS Academy Learner Lab & get the `role_arn` by command line
     - could be installed by `winget` or `choco`
@@ -63,3 +65,35 @@ Destroy the resources to avoid unnecessary charges.
 ```bash
 terraform destroy -auto-approve
 ```
+
+## Example Application
+
+Switch to the `bookinfo` branch:
+```sh
+git checkout origin/bookinfo
+```
+
+Deploy using the following commands:
+```sh
+terraform init
+terraform apply -auto-approve
+```
+
+After a successful deployment, the example application should be running normally.
+
+Export the `INGRESS_HOST` variable:
+```sh
+export INGRESS_HOST=$(kubectl -n istio-ingress get service istio-ingress -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+```
+
+Send 100 requests to the application:
+```sh
+for i in $(seq 1 100); do curl -s -o /dev/null "http://$INGRESS_HOST/productpage" ; done
+```
+
+Then, start the Kiali dashboard:
+```sh
+istioctl dashboard kiali
+```
+
+You should see the traffic graph in the Kiali dashboard.

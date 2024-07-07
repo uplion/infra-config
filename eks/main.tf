@@ -2,6 +2,21 @@ provider "aws" {
   region = var.region
 }
 
+provider "kubernetes" {
+  host                   = aws_eks_cluster.main.endpoint
+  cluster_ca_certificate = base64decode(aws_eks_cluster.main.certificate_authority.0.data)
+  token                  = data.aws_eks_cluster_auth.main.token
+}
+
+provider "helm" {
+  kubernetes {
+    host                   = aws_eks_cluster.main.endpoint
+    cluster_ca_certificate = base64decode(aws_eks_cluster.main.certificate_authority.0.data)
+    token                  = data.aws_eks_cluster_auth.main.token
+  }
+}
+
+
 data "aws_availability_zones" "available" {}
 
 
@@ -39,6 +54,7 @@ resource "aws_eks_node_group" "main" {
   }
 
   instance_types = ["t3.medium"]
+
 }
 
 data "aws_eks_cluster_auth" "main" {
@@ -358,3 +374,156 @@ resource "aws_eks_addon" "before_compute" {
 }
 
 
+
+################################################################################
+# EKS Blueprints Addons (istio)
+################################################################################
+
+locals {
+  istio_chart_url     = "https://istio-release.storage.googleapis.com/charts"
+  istio_chart_version = "1.20.2"
+}
+resource "null_resource" "cli_connect_cluster" {
+  triggers = {
+    cluster_id   = aws_eks_cluster.main.id
+    cluster_name = aws_eks_cluster.main.name
+    region       = var.region
+  }
+
+  depends_on = [
+    aws_eks_cluster.main
+  ]
+
+  provisioner "local-exec" {
+    command = "aws eks update-kubeconfig --region ${var.region} --name ${aws_eks_cluster.main.name}"
+  }
+}
+
+resource "null_resource" "label_default_namespace" {
+  triggers = {
+    cluster_id   = aws_eks_cluster.main.id
+    cluster_name = aws_eks_cluster.main.name
+    region       = var.region
+  }
+
+  depends_on = [
+    aws_eks_cluster.main,
+    null_resource.cli_connect_cluster
+  ]
+
+  provisioner "local-exec" {
+    command = "kubectl label namespace default istio-injection=enabled --overwrite"
+  }
+}
+
+
+resource "kubernetes_namespace" "istio_system" {
+  metadata {
+    name = "istio-system"
+  }
+
+  depends_on = [
+    aws_eks_cluster.main,
+    aws_eks_node_group.main,
+    aws_eks_addon.before_compute,
+    aws_eks_addon.main,
+    module.vpc,
+    aws_security_group.cluster,
+    aws_security_group.node,
+    aws_security_group_rule.cluster,
+    aws_security_group_rule.node
+  ]
+}
+
+module "eks_blueprints_addons" {
+  source  = "aws-ia/eks-blueprints-addons/aws"
+  version = "~> 1.16"
+
+
+  cluster_name      = aws_eks_cluster.main.name
+  cluster_endpoint  = aws_eks_cluster.main.endpoint
+  cluster_version   = aws_eks_cluster.main.version
+  oidc_provider_arn = var.role_arn
+
+  # Due to the lack of permissions to create IAM roles
+  # it is not possible to use the aws-ia/eks-blueprints-addons/aws to create the aws_load_balancer_controller.
+
+  helm_releases = {
+    istio-base = {
+      chart         = "base"
+      chart_version = local.istio_chart_version
+      repository    = local.istio_chart_url
+      name          = "istio-base"
+      namespace     = kubernetes_namespace.istio_system.metadata[0].name
+    }
+
+    istiod = {
+      chart         = "istiod"
+      chart_version = local.istio_chart_version
+      repository    = local.istio_chart_url
+      name          = "istiod"
+      namespace     = kubernetes_namespace.istio_system.metadata[0].name
+
+      set = [
+        {
+          name  = "meshConfig.accessLogFile"
+          value = "/dev/stdout"
+        }
+      ]
+    }
+
+    istio-ingress = {
+      chart            = "gateway"
+      chart_version    = local.istio_chart_version
+      repository       = local.istio_chart_url
+      name             = "istio-ingress"
+      namespace        = "istio-ingress" # per https://github.com/istio/istio/blob/master/manifests/charts/gateways/istio-ingress/values.yaml#L2
+      create_namespace = true
+
+      values = [
+        yamlencode(
+          {
+            labels = {
+              istio = "ingressgateway"
+            }
+          }
+        )
+      ]
+    }
+  }
+
+  depends_on = [kubernetes_namespace.istio_system]
+}
+
+resource "null_resource" "restart_istio_ingress" {
+  triggers = {
+    cluster_id   = aws_eks_cluster.main.id
+    cluster_name = aws_eks_cluster.main.name
+    region       = var.region
+  }
+
+  depends_on = [
+    aws_eks_cluster.main,
+    aws_eks_addon.main,
+    module.eks_blueprints_addons,
+    null_resource.cli_connect_cluster
+  ]
+
+  provisioner "local-exec" {
+    command = "kubectl rollout restart deployment istio-ingress -n istio-ingress"
+  }
+}
+
+################################################################################
+# Istio Observability Add-ons
+################################################################################
+
+resource "helm_release" "istio_addons" {
+  name         = "istio-addons"
+  chart        = "${path.module}/istio_addons"
+  force_update = true
+
+  depends_on = [
+    kubernetes_namespace.istio_system
+  ]
+}

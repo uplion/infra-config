@@ -1,0 +1,6 @@
+apiVersion: v2
+name: istio_addons
+description: "Istio Addons: grafana, jaeger, kiali, loki, prometheus"
+type: application
+version: 0.1.0
+appVersion: "1.16.0"

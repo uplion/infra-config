@@ -20,6 +20,7 @@ variable "cluster_name" {
   default     = "eks-cluster"
 }
 
+
 variable "cluster_version" {
   description = "The desired Kubernetes version for creating the EKS cluster."
   type        = string
@@ -158,4 +159,10 @@ variable "cluster_security_group_tags" {
   description = "A map of additional tags to add to the cluster security group created"
   type        = map(string)
   default     = {}
+}
+
+variable "disabled_istio_addons" {
+  description = "List of Istio addons to disable"
+  type        = list(string)
+  default     = []
 }
