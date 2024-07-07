@@ -424,14 +424,7 @@ resource "kubernetes_namespace" "istio_system" {
 
   depends_on = [
     aws_eks_cluster.main,
-    aws_eks_node_group.main,
-    aws_eks_addon.before_compute,
-    aws_eks_addon.main,
-    module.vpc,
-    aws_security_group.cluster,
-    aws_security_group.node,
-    aws_security_group_rule.cluster,
-    aws_security_group_rule.node
+    module.vpc
   ]
 }
 
@@ -524,6 +517,10 @@ resource "helm_release" "istio_addons" {
   force_update = true
 
   depends_on = [
-    kubernetes_namespace.istio_system
+    kubernetes_namespace.istio_system,
+    module.eks_blueprints_addons,
+    null_resource.cli_connect_cluster,
+    null_resource.label_default_namespace,
+    null_resource.restart_istio_ingress
   ]
 }
