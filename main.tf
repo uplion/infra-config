@@ -24,9 +24,6 @@ locals {
   istio_chart_url     = "https://istio-release.storage.googleapis.com/charts"
   istio_chart_version = "1.20.2"
 
-  redis_cluster_chart_url       = "https://charts.bitnami.com/bitnami"
-  redis_cluster_chart_version   = "10.2.6"
-
   tags = {
     GithubRepo = "github.com/uplion/infra-config"
   }
@@ -87,8 +84,6 @@ resource "kubernetes_namespace_v1" "istio_system" {
   }
 }
 
-
-
 module "eks_blueprints_addons" {
   source  = "aws-ia/eks-blueprints-addons/aws"
   version = "~> 1.16"
@@ -103,19 +98,6 @@ module "eks_blueprints_addons" {
   # it is not possible to use the aws-ia/eks-blueprints-addons/aws to create the aws_load_balancer_controller.
 
   helm_releases = {
-    # redis
-    redis-cluster = {
-        chart               = "redis-cluster"
-        chart_version       = local.redis_cluster_chart_version
-        repository          = local.redis_cluster_chart_url
-        name                = "redis-cluster"
-        namespace           = "redis-cluster" # per
-        create_namespace    = true
-        set = [{
-            name = "password"
-            value = var.redis_cluster_password
-        }]
-    }
 
     # istio
     istio-base = {
