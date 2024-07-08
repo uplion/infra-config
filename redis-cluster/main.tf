@@ -3,29 +3,6 @@ resource "random_password" "redis" {
   special = true
 }
 
-# resource "kubernetes_persistent_volume" "pv" {
-#   count = 6
-
-#   metadata {
-#     name   = "${var.pv_name_prefix}-pv-${count.index}"
-#     labels = var.pv_labels
-#   }
-
-#   spec {
-#     capacity = {
-#       storage = var.storage_size # 设置 PV 的存储容量
-#     }
-
-#     access_modes = ["ReadWriteMany"] # 设置访问模式
-#     persistent_volume_source {
-#       local {
-#         path = "/mnt/data/redis-cluster-${count.index}"
-#       }
-#     }
-#     persistent_volume_reclaim_policy = "Retain" # 设置回收策略
-#   }
-# }
-
 resource "helm_release" "redis_cluster" {
   name            = var.name
   repository      = "oci://registry-1.docker.io/bitnamicharts"
@@ -49,9 +26,8 @@ resource "helm_release" "redis_cluster" {
         # }
         persistence = {
           storageClass = var.storage_class
-          accessModes  = ["ReadWriteOnce"]
+          accessModes  = ["ReadWriteOnce"] # ReadWriteOnce & ReadWriteOncePod supported for local-path provisioner only
           size         = var.storage_size
-          #   matchLabels = var.pv_labels
         }
         # password = random_password.redis.result
       }
