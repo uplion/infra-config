@@ -68,6 +68,8 @@ terraform destroy -auto-approve
 
 ## Example Application
 
+### Istio
+
 Switch to the `bookinfo` branch:
 ```sh
 git checkout origin/bookinfo
@@ -97,3 +99,39 @@ istioctl dashboard kiali
 ```
 
 You should see the traffic graph in the Kiali dashboard.
+
+### Redis Cluster
+
+0. Prerequirity: [redis-cli](https://redis.io/docs/latest/operate/rs/references/cli-utilities/redis-cli/)
+
+1. Get redis cluster password using command below:
+
+```bash
+export REDIS_PASSWORD=$(kubectl get secret --namespace redis-cluster redis-cluster -o jsonpath="{.data.redis-password}" | base64 --decode)
+```
+
+2. Expose redis-cluster service to local port (e.g. 8080):
+
+```bash
+kubectl port-forward svc/redis-cluster -n redis-cluster 8080:6379
+```
+
+3. Start another terminal, connect to redis using redis-cli:
+
+```bash
+redis-cli -h localhost -p 8080 -a $REDIS_PASSWORD
+```
+
+if operate successfully, you will see the redis-cli prompt like `localhost:8080> `.
+
+4. Test redis-cluster:
+
+```bash
+localhost:8080> info
+```
+
+You should see the redis information like `cluster_enabled:1`.
+
+## License
+
+MIT

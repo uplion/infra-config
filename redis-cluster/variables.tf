@@ -11,7 +11,7 @@ variable "replica_count" {
 
 variable "storage_class" {
   type        = string
-  default     = "standard"
+  default     = "local-path"
   description = "Storage class to use for PVs"
 }
 variable "storage_size" {

@@ -44,6 +44,7 @@ module "eks" {
     eks-pod-identity-agent = {}
     kube-proxy             = {}
     vpc-cni                = {}
+    aws-ebs-csi-driver     = {}
   }
 
   node_instance_types = ["t3.medium"]
@@ -77,13 +78,15 @@ module "eks" {
 
 module "redis_cluster" {
   source = "./redis-cluster"
+  depends_on = [
+    module.eks
+  ]
 
   node_count    = 6
   replica_count = 1
-  storage_class = "gp2"
+  storage_class = "local-path"
   storage_size  = "1Gi"
 
-  pv_name_prefix = "redis-cluster"
   pv_labels = {
     app = "redis-cluster"
   }
