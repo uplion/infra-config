@@ -44,7 +44,7 @@ module "eks" {
     eks-pod-identity-agent = {}
     kube-proxy             = {}
     vpc-cni                = {}
-    aws-ebs-csi-driver     = {}
+    # aws-ebs-csi-driver     = {}
   }
 
   node_instance_types = ["t3.medium"]
@@ -77,7 +77,7 @@ module "eks" {
 ################################################################################
 
 module "redis_cluster" {
-  source = "./redis-cluster"
+  source = "./redis_cluster_addon"
   depends_on = [
     module.eks
   ]
@@ -94,3 +94,32 @@ module "redis_cluster" {
   name      = "redis-cluster"
   namespace = "redis-cluster"
 }
+
+################################################################################
+# PostgreSQL
+################################################################################
+
+module "postgresql_ha" {
+  source = "./postgresql_ha_addon"
+  depends_on = [
+    module.eks
+  ]
+}
+
+################################################################################
+# Pulsar
+################################################################################
+# module "pulsar" {
+#   source = "./pulsar_addon"
+#   depends_on = [
+#     module.eks
+#   ]
+
+#   cluster_id     = module.eks.cluster_id
+#   cluster_name   = module.eks.cluster_name
+#   cluster_region = var.region
+
+#   name               = "pulsar"
+#   namespace          = "pulsar"
+#   storage_class_name = "local-path"
+# }
