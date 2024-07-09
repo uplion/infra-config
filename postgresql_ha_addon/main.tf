@@ -17,8 +17,11 @@ resource "helm_release" "postgresql_ha" {
   name       = var.name
   repository = "oci://registry-1.docker.io/bitnamicharts"
   chart      = "postgresql-ha"
-  namespace  = var.namespace
   version    = "14.2.11"
+
+  namespace        = var.namespace
+  create_namespace = true
+
   values = [
     yamlencode(
       {

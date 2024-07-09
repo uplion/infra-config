@@ -110,24 +110,60 @@ You should see the traffic graph in the Kiali dashboard.
 export REDIS_PASSWORD=$(kubectl get secret --namespace redis-cluster redis-cluster -o jsonpath="{.data.redis-password}" | base64 --decode)
 ```
 
-2. Expose redis-cluster service to local port (e.g. 8080):
+2. Expose redis-cluster service to local port (e.g. 6379):
 
 ```bash
-kubectl port-forward svc/redis-cluster -n redis-cluster 8080:6379
+kubectl port-forward svc/redis-cluster -n redis-cluster 6379:6379
 ```
 
 3. Start another terminal, connect to redis using redis-cli:
 
 ```bash
-redis-cli -h localhost -p 8080 -a $REDIS_PASSWORD
+redis-cli -h localhost -p 6379 -a $REDIS_PASSWORD
 ```
 
-if operate successfully, you will see the redis-cli prompt like `localhost:8080> `.
+if operate successfully, you will see the redis-cli prompt like `localhost:6379> `.
 
 4. Test redis-cluster:
 
+```
+localhost:6379> info
+```
+
+You should see the redis information like `cluster_enabled:1`.
+
+### PostgreSQL HA
+
+0. Prerequirity: [postgresql](https://www.postgresql.org/download/linux/debian/)
+    - postgresql
+    - postgresql-common
+    - postgresql-client-\[version\]
+
+1. Get postgresql password using command below:
+
 ```bash
-localhost:8080> info
+kubectl get secret --namespace postgresql-ha postgresql-ha-postgresql -o jsonpath="{.data.password}" | base64 --decode
+```
+
+2. Expose redis-cluster service to local port (e.g. 5432):
+
+```bash
+kubectl port-forward svc/postgresql-ha-pgpool -n postgresql-ha 5432:5432
+```
+
+3. Start another terminal, connect to redis using redis-cli:
+
+```bash
+psql api_server -h localhost -p 5432 -U postgres -W
+```
+
+Then input the password you got in step 1.
+If operate successfully, you will see the psql prompt like `api_server=# `.
+
+4. Test redis-cluster:
+
+```
+api_server=# \dconfig
 ```
 
 You should see the redis information like `cluster_enabled:1`.

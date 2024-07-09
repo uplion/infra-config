@@ -537,7 +537,10 @@ resource "null_resource" "local_path_provisioner" {
   }
 
   depends_on = [
-    aws_eks_cluster.main
+    aws_eks_cluster.main,
+    aws_eks_addon.main,
+    module.eks_blueprints_addons,
+    null_resource.cli_connect_cluster
   ]
 
   provisioner "local-exec" {
