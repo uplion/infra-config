@@ -1,0 +1,15 @@
+name: postgres-ha
+backupsStorageClassName: local-path
+multiBackupRepos:
+  - volume: 
+    backupsStorageClassName: local-path
+    backupsSize            : 1Gi
+instances: 
+  - dataVolumeClaimSepc: 
+      accessModes: ["ReadWriteOnce"]
+      resources: 
+        requests: 
+          storage: 1Gi
+      
+    
+

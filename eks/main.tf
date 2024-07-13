@@ -48,13 +48,12 @@ resource "aws_eks_node_group" "main" {
   subnet_ids      = module.vpc.private_subnets
 
   scaling_config {
-    desired_size = try(var.node_group_scaling_config.desired_size, 4)
-    max_size     = try(var.node_group_scaling_config.max_size, 7)
+    desired_size = try(var.node_group_scaling_config.desired_size, 8)
+    max_size     = try(var.node_group_scaling_config.max_size, 15)
     min_size     = try(var.node_group_scaling_config.min_size, 1)
   }
 
-  instance_types = ["t3.medium"]
-
+  instance_types = var.node_instance_types
 }
 
 data "aws_eks_cluster_auth" "main" {
@@ -461,6 +460,10 @@ module "eks_blueprints_addons" {
         {
           name  = "meshConfig.accessLogFile"
           value = "/dev/stdout"
+        },
+        {
+          name  = "meshConfig.defaultConfig.tracing.sampling"
+          value = "100"
         }
       ]
     }
@@ -513,7 +516,7 @@ resource "null_resource" "restart_istio_ingress" {
 
 resource "helm_release" "istio_addons" {
   name         = "istio-addons"
-  chart        = "${path.module}/istio_addons"
+  chart        = "${path.root}/charts/istio_addons"
   force_update = true
 
   depends_on = [
@@ -523,27 +526,4 @@ resource "helm_release" "istio_addons" {
     null_resource.label_default_namespace,
     null_resource.restart_istio_ingress
   ]
-}
-
-################################################################################
-# Local Path Provisioner Add-on
-################################################################################
-
-resource "null_resource" "local_path_provisioner" {
-  triggers = {
-    cluster_id   = aws_eks_cluster.main.id
-    cluster_name = aws_eks_cluster.main.name
-    region       = var.region
-  }
-
-  depends_on = [
-    aws_eks_cluster.main,
-    aws_eks_addon.main,
-    module.eks_blueprints_addons,
-    null_resource.cli_connect_cluster
-  ]
-
-  provisioner "local-exec" {
-    command = "kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/v0.0.28/deploy/local-path-storage.yaml"
-  }
 }

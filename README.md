@@ -168,6 +168,16 @@ api_server=# \dconfig
 
 You should see the redis information like `cluster_enabled:1`.
 
+### Pulsar
+
+2. Expose pulsar service to local port (e.g. 5432):
+
+```bash
+kubectl port-forward svc/pulsar-proxy -n pulsar 6650:6650
+```
+
+3. 
+
 ## License
 
 MIT
