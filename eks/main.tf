@@ -423,7 +423,9 @@ resource "kubernetes_namespace" "istio_system" {
 
   depends_on = [
     aws_eks_cluster.main,
-    module.vpc
+    module.vpc,
+    aws_eks_addon.main,
+    null_resource.cli_connect_cluster
   ]
 }
 
@@ -447,6 +449,7 @@ module "eks_blueprints_addons" {
       repository    = local.istio_chart_url
       name          = "istio-base"
       namespace     = kubernetes_namespace.istio_system.metadata[0].name
+      #   depends_on    = [helm_release.istiod]
     }
 
     istiod = {
@@ -476,6 +479,8 @@ module "eks_blueprints_addons" {
       namespace        = "istio-ingress" # per https://github.com/istio/istio/blob/master/manifests/charts/gateways/istio-ingress/values.yaml#L2
       create_namespace = true
 
+      #   depends_on = [helm_release.istiod]
+
       values = [
         yamlencode(
           {
@@ -488,7 +493,7 @@ module "eks_blueprints_addons" {
     }
   }
 
-  depends_on = [kubernetes_namespace.istio_system]
+  depends_on = [kubernetes_namespace.istio_system, null_resource.cli_connect_cluster, null_resource.label_default_namespace]
 }
 
 resource "null_resource" "restart_istio_ingress" {
@@ -524,6 +529,8 @@ resource "helm_release" "istio_addons" {
     module.eks_blueprints_addons,
     null_resource.cli_connect_cluster,
     null_resource.label_default_namespace,
-    null_resource.restart_istio_ingress
+    null_resource.restart_istio_ingress,
+    aws_eks_addon.main,
+    aws_eks_addon.before_compute
   ]
 }

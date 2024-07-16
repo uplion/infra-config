@@ -4,22 +4,16 @@ variable "redis_operator_name" {
   default     = "redis-operator"
 }
 
-variable "redis_operator_namespace" {
-  description = "The namespace to install the Helm release of the Redis operator"
-  type        = string
-  default     = "redis-operator"
-}
-
 variable "redis_name" {
   description = "The name of the Redis instance"
   type        = string
   default     = "redis-cluster"
 }
 
-variable "redis_namespace" {
-  description = "The namespace to deploy the Redis instance"
+variable "namespace" {
+  description = "The namespace to install the Helm release of the Redis operator"
   type        = string
-  default     = "redis-operator"
+  default     = "ot-operators"
 }
 
 variable "redis_cluster_size" {

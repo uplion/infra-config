@@ -19,6 +19,9 @@ resource "helm_release" "pulsar" {
   create_namespace  = true
   dependency_update = true
 
+  depends_on = [null_resource.prepare_helm_release]
+
+
   values = [yamlencode({
     volumes = {
       local_storage = (var.storage_class_name == "local-path")

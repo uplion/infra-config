@@ -39,3 +39,15 @@ variable "postgres_storage_class_name" {
   type        = string
   default     = "local-path"
 }
+
+variable "dbname" {
+  description = "The name of the database to create"
+  type        = string
+  default     = "postgres"
+}
+
+variable "username" {
+  description = "The name of the user to create"
+  type        = string
+  default     = "test"
+}

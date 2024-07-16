@@ -1,3 +1,13 @@
+terraform {
+  required_providers {
+    kustomization = {
+      source  = "kbst/kustomization"
+      version = "0.9.6"
+    }
+  }
+}
+
+
 provider "aws" {
   region = var.region
 }
@@ -19,16 +29,14 @@ provider "helm" {
 
 provider "random" {}
 
-# provider "kustomization" {
-#   kubeconfig_path = module.eks.kubeconfig_path
-# }
-
+provider "kustomization" {
+  kubeconfig_path = "~/.kube/config"
+}
 
 locals {
   tags = {
     GithubRepo = "github.com/uplion/infra-config"
   }
-
 }
 
 ################################################################################
@@ -51,7 +59,7 @@ module "eks" {
     # aws-ebs-csi-driver     = {}
   }
 
-  node_instance_types = ["t3.large"]
+  node_instance_types = ["t3.medium"]
 
   #  EKS K8s API cluster needs to be able to talk with the EKS worker nodes with port 15017/TCP and 15012/TCP which is used by Istio
   #  Istio in order to create sidecar needs to be able to communicate with webhook and for that network passage to EKS is needed.
@@ -137,17 +145,16 @@ module "redis_operator" {
   depends_on = [
     module.eks,
     module.local_path_provisioner,
-    module.pulsar
+    module.pulsar,
     # helm_release.cert_manager
   ]
 
   redis_operator_name      = "redis-operator"
-  redis_operator_namespace = "redis-operator"
   redis_name               = "redis-cluster"
-  redis_namespace          = "redis-operator"
+  namespace                = "ot-operators"
   redis_cluster_size       = 3
-  redis_storage_size       = "1Gi"
   redis_storage_class_name = "local-path"
+  redis_storage_size       = "1Gi"
 }
 
 ################################################################################
@@ -167,7 +174,7 @@ module "postgres_operator" {
   depends_on = [
     module.eks,
     module.local_path_provisioner,
-    module.pulsar
+    module.pulsar,
   ]
 
   postgres_operator_name      = "postgres-operator"
@@ -195,7 +202,7 @@ module "pulsar" {
   cluster_region = var.region
 
   # using default values
-  name               = "pulsar"
+  name               = "pulsar-local"
   namespace          = "pulsar"
   storage_class_name = "local-path"
 }
@@ -232,3 +239,129 @@ resource "helm_release" "keda" {
     podNamespace = "keda"
   })]
 }
+
+################################################################################
+# Ingress Gateway
+################################################################################
+
+# data "kustomization_build" "ingress_gateway_data" {
+#   path = "${path.root}/kustomize/ingress-gateway"
+# }
+
+# module "ingress_gateway" {
+#   source     = "./modules/kustomization_apply"
+#   depends_on = [module.eks, module.main_api_service, module.admin_panel, module.frontend]
+#   providers = {
+#     kustomization = kustomization
+#   }
+
+#   ids_prio  = data.kustomization_build.ingress_gateway_data.ids_prio
+#   manifests = data.kustomization_build.ingress_gateway_data.manifests
+# }
+
+################################################################################
+# AI Model Operator
+################################################################################
+
+# data "kustomization_build" "ai_model_operator_data" {
+#   path = "${path.root}/kustomize/ai-model-operator/default"
+# }
+
+# module "ai_model_operator" {
+#   source = "./modules/kustomization_apply"
+#   providers = {
+#     kustomization = kustomization
+#   }
+
+#   depends_on = [
+#     module.eks,
+#     module.local_path_provisioner,
+#     module.pulsar
+#   ]
+
+#   ids_prio  = data.kustomization_build.ai_model_operator_data.ids_prio
+#   manifests = data.kustomization_build.ai_model_operator_data.manifests
+# }
+
+################################################################################
+# Main API Service
+################################################################################
+
+# locals {
+#   pulsar_url = "pulsar://pulsar-local-broker.pulsar.svc.cluster.local:6650"
+# }
+
+# module "main_api_service" {
+#   source     = "./modules/main_api_service"
+#   depends_on = [module.eks, module.local_path_provisioner, module.pulsar]
+
+#   replicas           = 3
+#   pulsar_url         = local.pulsar_url
+#   storage_class_name = "local-path"
+
+#   name      = "main-api-service"
+#   namespace = "main-api-service"
+# }
+
+################################################################################
+# Admin Panel
+################################################################################
+
+# module "admin_panel" {
+#   source     = "./modules/admin_panel"
+#   depends_on = [module.eks, module.local_path_provisioner, module.postgres_operator]
+
+#   name      = "admin-panel"
+#   namespace = "admin-panel"
+#   replicas  = 1
+#   resource = {
+#     cpu    = "100m"
+#     memory = "256Mi"
+#   }
+
+#   postgres_config = { # TODO to be configured
+#     username = module.postgres_operator.postgres_username
+#     password = module.postgres_operator.postgres_password
+#     host     = module.postgres_operator.postgres_host
+#     port     = module.postgres_operator.postgres_port
+#     dbname   = module.postgres_operator.postgres_dbname
+#   }
+# }
+
+################################################################################
+# Frontend
+################################################################################
+
+# module "frontend" {
+#   source     = "./modules/frontend"
+#   depends_on = [module.eks, module.local_path_provisioner, module.main_api_service]
+
+#   name      = "frontend"
+#   namespace = "frontend"
+#   replicas  = 3
+#   resource = {
+#     cpu    = "100m"
+#     memory = "256Mi"
+#   }
+# }
+
+################################################################################
+# Frontend
+################################################################################
+# locals {
+#   pulsar_url = "pulsar://pulsar-local-broker.pulsar.svc.cluster.local:6650"
+# }
+
+# module "workers" {
+#   source     = "./modules/worker_nodes"
+#   depends_on = [module.eks, module.local_path_provisioner, module.pulsar, module.ai_model_operator]
+
+#   name       = "worker-nodes"
+#   namespace  = "worker-nodes"
+#   replicas   = 1
+#   pulsar_url = local.pulsar_url
+#   resource = {
+#     cpu    = "100m"
+#     memory = "256Mi"
+#   }
+# }

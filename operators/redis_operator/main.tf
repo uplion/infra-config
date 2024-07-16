@@ -1,20 +1,24 @@
 ### TODO add cert-manager support
 # https://github.com/OT-CONTAINER-KIT/helm-charts/tree/main/charts/redis-operator
 
+locals {
+  node_conf_storage_size = "100Mi"
+}
+
 resource "helm_release" "redis_operator" {
   name       = var.redis_operator_name
   repository = "https://ot-container-kit.github.io/helm-charts"
   chart      = "redis-operator"
-  version    = "0.16.4"
+  version    = "0.18.0"
 
-  namespace        = var.redis_operator_namespace
+  namespace        = var.namespace
   create_namespace = true
 
   values = [yamlencode({
     redisOperator = {
       name = var.redis_operator_name # Operator name
       #   imageName = "ghcr.io/ot-container-kit/redis-operator/redis-operator:v0.17.0" # Image repository	
-      # imageTag = "{{appVersion}}" # Image tag
+      #   imageTag = "{{appVersion}}" # Image tag
       #   imagePullPolicy = "Always"        # Image pull policy
       #   podAnnotations  = {}              # Additional pod annotations
       #   podLabels       = {}              # Additional Pod labels
@@ -66,13 +70,25 @@ resource "helm_release" "redis_cluster" {
   chart      = "redis-cluster"
   version    = "0.16.0"
 
-  namespace        = var.redis_namespace
+  namespace        = var.namespace
   create_namespace = true
+
+  depends_on = [helm_release.redis_operator]
 
   values = [yamlencode({
     # imagePullSecrets = [] # List of image pull secrets, in case redis image is getting pull from private registry
     redisCluster = {
       clusterSize = var.redis_cluster_size # Size of the redis cluster leader and follower nodes
+      resources = {
+        limits = {
+          cpu    = "500m"  # CPU limit for redis pods
+          memory = "500Mi" # Memory limit for redis pods
+        }
+        requests = {
+          cpu    = "500m"  # CPU request for redis pods
+          memory = "500Mi" # Memory request for redis pods
+        }
+      }
       #   clusterVersion      = "v7"                    # Major version of Redis setup, values can be v6 or v7
       #   persistenceEnabled  = true                    # Persistence should be enabled or not in the Redis cluster setup
       #   secretName          = "redis-secret"          # Name of the existing secret in Kubernetes
@@ -107,11 +123,22 @@ resource "helm_release" "redis_cluster" {
     # nodeSelector      = {} # NodeSelector for redis statefulset
     # priorityClassName = "" # Priority class name for the redis statefulset
     storageSpec = { # Storage configuration for redis setup
+      nodeConfVolumeClaimTemplate = {
+        spec = {
+          storageClassName = var.redis_storage_class_name # Storage class name for the volume
+          accessModes      = ["ReadWriteOnce"]            # Access mode for the volume
+          resources = {
+            requests = {
+              storage = local.node_conf_storage_size # Storage size for the volume
+            }
+          }
+        }
+      }
       volumeClaimTemplate = {
         spec = {
           storageClassName = var.redis_storage_class_name # Storage class name for the volume
           accessModes      = ["ReadWriteOnce"]            # Access mode for the volume
-          resource = {
+          resources = {
             requests = {
               storage = var.redis_storage_size # Storage size for the volume
             }

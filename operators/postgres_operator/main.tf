@@ -19,6 +19,8 @@ resource "helm_release" "postgres_ha" {
   namespace        = var.postgres_namespace
   create_namespace = true
 
+  depends_on = [helm_release.postgres_operator]
+
   values = [
     yamlencode({
       imagePostgres   = "registry.developers.crunchydata.com/crunchydata/crunchy-postgres:ubi8-16.3-1"
@@ -26,8 +28,9 @@ resource "helm_release" "postgres_ha" {
       instances = [{
         name     = "postgres-ha"
         replicas = var.postgres_replicas
-        dataVolumeClaimSepc = {
-          accessModes = ["ReadWriteOnce"]
+        dataVolumeClaimSpec = {
+          storageClassName = var.postgres_storage_class_name
+          accessModes      = ["ReadWriteOnce"]
           resources = {
             requests = {
               storage = var.postgres_storage_size
@@ -36,7 +39,7 @@ resource "helm_release" "postgres_ha" {
         }
         affinity = {
           podAntiAffinity = {
-            preferredDuringSchedulingIgnoredDuringExecution = {
+            preferredDuringSchedulingIgnoredDuringExecution = [{
               weight = 1
               podAffinityTerm = {
                 topologyKey = "kubernetes.io/hostname"
@@ -47,7 +50,7 @@ resource "helm_release" "postgres_ha" {
                   }
                 }
               }
-            }
+            }]
           }
         }
       }]
@@ -75,7 +78,7 @@ resource "helm_release" "postgres_ha" {
       pgBouncerConfig = {
         affinity = {
           podAntiAffinity = {
-            preferredDuringSchedulingIgnoredDuringExecution = {
+            preferredDuringSchedulingIgnoredDuringExecution = [{
               weight = 1
               podAffinityTerm = {
                 topologyKey = "kubernetes.io/hostname"
@@ -86,15 +89,38 @@ resource "helm_release" "postgres_ha" {
                   }
                 }
               }
-            }
+            }]
           }
         }
       }
+      users = [{
+        databases = [var.dbname]
+        name      = var.username
+        password = {
+          type = "AlphaNumeric"
+        }
+      }]
     })
   ]
 }
 
-### Kustomize # TODO change storage class
+data "kubernetes_secret_v1" "postgres_ha" {
+  metadata {
+    name      = "${var.postgres_name}-pguser-${var.username}"
+    namespace = var.postgres_namespace
+  }
+
+  depends_on = [helm_release.postgres_ha]
+}
+
+# data "kubernetes_secret_v1" "postgres_ha" {
+#   metadata {
+#     name      = "postgres-ha"
+#     namespace = var.postgres_namespace
+#   }
+# }
+
+### Kustomize # change storage class if use
 # ####### Postgres Operator
 # resource "kubernetes_namespace_v1" "postgres_operator" {
 #     metadata {
