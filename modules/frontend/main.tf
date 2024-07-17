@@ -74,7 +74,7 @@ resource "kubernetes_deployment_v1" "frontend" {
 
           env {
             name  = "OPENAI_BASE_URL"
-            value = "http://main-api-service.main-api-service.svc.cluster.local/api/v1"
+            value = "http://${var.openai_host}/api/v1"
           }
 
           image_pull_policy = "IfNotPresent"

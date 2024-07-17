@@ -38,12 +38,4 @@ variable "postgres_config" {
     port     = string
     dbname   = string
   })
-
-  #   default = { # TODO to be configured
-  #     username = "postgres"
-  #     password = "postgres"
-  #     host     = "postgres"
-  #     port     = "5432"
-  #     dbname   = "postgres"
-  #   }
 }

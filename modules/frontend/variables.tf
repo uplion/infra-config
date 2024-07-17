@@ -27,3 +27,9 @@ variable "replicas" {
   type        = number
   default     = 3
 }
+
+variable "openai_host" {
+  description = "The host of the OpenAI API"
+  type        = string
+  default     = "api.openai.com"
+}

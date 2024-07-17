@@ -60,8 +60,8 @@ metadataPrefix: ""
 ## See https://istio.io/latest/docs/ops/configuration/traffic-management/protocol-selection/#explicit-protocol-selection
 ## Prefixes are disabled by default
 
-tcpPrefix: ""  # For Istio this will be "tcp-"
-tlsPrefix: ""  # For Istio this will be "tls-"
+tcpPrefix: "" # For Istio this will be "tcp-"
+tlsPrefix: "" # For Istio this will be "tls-"
 
 ## Persistence
 ##
@@ -82,7 +82,6 @@ volumes:
   # configure the components to use local persistent volume
   # the local provisioner should be installed prior to enable local persistent volume
   local_storage: false
-  # TODO add storage_class_name option
 
 ## RBAC
 ##
@@ -219,7 +218,7 @@ tls:
     # 15d
     renewBefore: 360h
     organization:
-      - pulsar
+    - pulsar
     keySize: 4096
     keyAlgorithm: RSA
     keyEncoding: PKCS8
@@ -319,8 +318,8 @@ zookeeper:
     interval: 60s
     scrapeTimeout: 60s
     metricRelabelings:
-      # - action: labeldrop
-      #   regex: cluster
+    # - action: labeldrop
+    #   regex: cluster
   # True includes annotation for statefulset that contains hash of corresponding configmap, which will cause pods to restart on configmap change
   restartPodsOnConfigMapChange: false
   ports:
@@ -330,7 +329,7 @@ zookeeper:
     follower: 2888
     leaderElection: 3888
   # nodeSelector:
-    # cloud.google.com/gke-nodepool: default-pool
+  # cloud.google.com/gke-nodepool: default-pool
   probe:
     liveness:
       enabled: true
@@ -397,13 +396,13 @@ zookeeper:
       ## If left undefined no storage class will be defined along with PVC
       ##
       # storageClass:
-        # type: pd-ssd
-        # fsType: xfs
-        # provisioner: kubernetes.io/gce-pd
+      # type: pd-ssd
+      # fsType: xfs
+      # provisioner: kubernetes.io/gce-pd
       ## If you want to bind static persistent volumes via selectors, e.g.:
       # selector:
-        # matchLabels:
-        # app: pulsar-zookeeper
+      # matchLabels:
+      # app: pulsar-zookeeper
       selector: {}
     ## If you set useSeparateDiskForTxlog to true, this section configures the extra volume for the zookeeper transaction log.
     datalog:
@@ -418,13 +417,13 @@ zookeeper:
       ## If left undefined no storage class will be defined along with PVC
       ##
       # storageClass:
-        # type: pd-ssd
-        # fsType: xfs
-        # provisioner: kubernetes.io/gce-pd
+      # type: pd-ssd
+      # fsType: xfs
+      # provisioner: kubernetes.io/gce-pd
       ## If you want to bind static persistent volumes via selectors, e.g.:
       # selector:
-        # matchLabels:
-        # app: pulsar-zookeeper
+      # matchLabels:
+      # app: pulsar-zookeeper
       selector: {}
   # External zookeeper server list in case of global-zk list to create zk cluster across zk deployed on different clusters/namespaces
   # Example value: "us-east1-pulsar-zookeeper-0.us-east1-pulsar-zookeeper.us-east1.svc.cluster.local:2888:3888,us-east1-pulsar-zookeeper-1.us-east1-pulsar-zookeeper.us-east1.svc.cluster.local:2888:3888,us-east1-pulsar-zookeeper-2.us-east1-pulsar-zookeeper.us-east1.svc.cluster.local:2888:3888,us-west1-pulsar-zookeeper-0.us-west1-pulsar-zookeeper.us-west1.svc.cluster.local:2888:3888,us-west1-pulsar-zookeeper-1.us-west1-pulsar-zookeeper.us-west1.svc.cluster.local:2888:3888,us-west1-pulsar-zookeeper-2.us-west1-pulsar-zookeeper.us-west1.svc.cluster.local:2888:3888"
@@ -440,16 +439,7 @@ zookeeper:
     PULSAR_MEM: >
       -Xms64m -Xmx128m
     PULSAR_GC: >
-      -XX:+UseG1GC
-      -XX:MaxGCPauseMillis=10
-      -Dcom.sun.management.jmxremote
-      -Djute.maxbuffer=10485760
-      -XX:+ParallelRefProcEnabled
-      -XX:+UnlockExperimentalVMOptions
-      -XX:+DoEscapeAnalysis
-      -XX:+DisableExplicitGC
-      -XX:+ExitOnOutOfMemoryError
-      -XX:+PerfDisableSharedMem
+      -XX:+UseG1GC -XX:MaxGCPauseMillis=10 -Dcom.sun.management.jmxremote -Djute.maxbuffer=10485760 -XX:+ParallelRefProcEnabled -XX:+UnlockExperimentalVMOptions -XX:+DoEscapeAnalysis -XX:+DisableExplicitGC -XX:+ExitOnOutOfMemoryError -XX:+PerfDisableSharedMem
   ## Add a custom command to the start up process of the zookeeper pods (e.g. update-ca-certificates, jvm commands, etc)
   additionalCommand:
   ## Zookeeper service
@@ -482,9 +472,9 @@ bookkeeper:
     ## Set the resources used for running `bin/bookkeeper shell initnewcluster`
     ##
     resources:
-      # requests:
-        # memory: 4Gi
-        # cpu: 2
+    # requests:
+    # memory: 4Gi
+    # cpu: 2
   replicaCount: 4
   updateStrategy:
     type: RollingUpdate
@@ -495,8 +485,8 @@ bookkeeper:
     interval: 60s
     scrapeTimeout: 60s
     metricRelabelings:
-      # - action: labeldrop
-      #   regex: cluster
+    # - action: labeldrop
+    #   regex: cluster
   # True includes annotation for statefulset that contains hash of corresponding configmap, which will cause pods to restart on configmap change
   restartPodsOnConfigMapChange: false
   ports:
@@ -504,7 +494,7 @@ bookkeeper:
     bookie: 3181
     statestore: 4181
   # nodeSelector:
-    # cloud.google.com/gke-nodepool: default-pool
+  # cloud.google.com/gke-nodepool: default-pool
   probe:
     liveness:
       enabled: true
@@ -572,43 +562,43 @@ bookkeeper:
       ## If left undefined no storage class will be defined along with PVC
       ##
       # storageClass:
-        # type: pd-ssd
-        # fsType: xfs
-        # provisioner: kubernetes.io/gce-pd
+      # type: pd-ssd
+      # fsType: xfs
+      # provisioner: kubernetes.io/gce-pd
       ## If you want to bind static persistent volumes via selectors, e.g.:
       # selector:
-        # matchLabels:
-        # app: pulsar-bookkeeper-journal
+      # matchLabels:
+      # app: pulsar-bookkeeper-journal
       selector: {}
       useMultiVolumes: false
       multiVolumes:
-        - name: journal0
-          size: 10Gi
-          # storageClassName: existent-storage-class
-          mountPath: /pulsar/data/bookkeeper/journal0
-        - name: journal1
-          size: 10Gi
-          # storageClassName: existent-storage-class
-          mountPath: /pulsar/data/bookkeeper/journal1
+      - name: journal0
+        size: 10Gi
+        # storageClassName: existent-storage-class
+        mountPath: /pulsar/data/bookkeeper/journal0
+      - name: journal1
+        size: 10Gi
+        # storageClassName: existent-storage-class
+        mountPath: /pulsar/data/bookkeeper/journal1
     ledgers:
       name: ledgers
       size: 50Gi
       local_storage: true
       # storageClassName:
       # storageClass:
-        # ...
+      # ...
       # selector:
-        # ...
+      # ...
       useMultiVolumes: false
       multiVolumes:
-        - name: ledgers0
-          size: 10Gi
-          # storageClassName: existent-storage-class
-          mountPath: /pulsar/data/bookkeeper/ledgers0
-        - name: ledgers1
-          size: 10Gi
-          # storageClassName: existent-storage-class
-          mountPath: /pulsar/data/bookkeeper/ledgers1
+      - name: ledgers0
+        size: 10Gi
+        # storageClassName: existent-storage-class
+        mountPath: /pulsar/data/bookkeeper/ledgers0
+      - name: ledgers1
+        size: 10Gi
+        # storageClassName: existent-storage-class
+        mountPath: /pulsar/data/bookkeeper/ledgers1
 
     ## use a single common volume for both journal and ledgers
     useSingleCommonVolume: false
@@ -618,9 +608,9 @@ bookkeeper:
       local_storage: true
       # storageClassName:
       # storageClass: ## this is common too
-        # ...
+      # ...
       # selector:
-        # ...
+      # ...
   ## Bookkeeper service account
   ## templates/bookkeeper-service-account.yaml
   service_account:
@@ -631,22 +621,9 @@ bookkeeper:
   configData:
     # we use `bin/pulsar` for starting bookie daemons
     PULSAR_MEM: >
-      -Xms128m
-      -Xmx256m
-      -XX:MaxDirectMemorySize=256m
+      -Xms128m -Xmx256m -XX:MaxDirectMemorySize=256m
     PULSAR_GC: >
-      -XX:+UseG1GC
-      -XX:MaxGCPauseMillis=10
-      -XX:+ParallelRefProcEnabled
-      -XX:+UnlockExperimentalVMOptions
-      -XX:+DoEscapeAnalysis
-      -XX:ParallelGCThreads=4
-      -XX:ConcGCThreads=4
-      -XX:G1NewSizePercent=50
-      -XX:+DisableExplicitGC
-      -XX:-ResizePLAB
-      -XX:+ExitOnOutOfMemoryError
-      -XX:+PerfDisableSharedMem
+      -XX:+UseG1GC -XX:MaxGCPauseMillis=10 -XX:+ParallelRefProcEnabled -XX:+UnlockExperimentalVMOptions -XX:+DoEscapeAnalysis -XX:ParallelGCThreads=4 -XX:ConcGCThreads=4 -XX:G1NewSizePercent=50 -XX:+DisableExplicitGC -XX:-ResizePLAB -XX:+ExitOnOutOfMemoryError -XX:+PerfDisableSharedMem
     #
     # Bookkeeper configuration reference: https://bookkeeper.apache.org/docs/reference/config
     #
@@ -660,19 +637,19 @@ bookkeeper:
     # configure the data compaction (bookie entry log compaction and gc) settings
     # https://bookkeeper.apache.org/docs/reference/config#garbage-collection-settings
     # https://bookkeeper.apache.org/docs/reference/config#entry-log-compaction-settings
-    minorCompactionThreshold: "0.2"     # default 0.2 (use default)
-    minorCompactionInterval: "360"      # default 3600 seconds (6 minutes vs default 1 hour)
-    majorCompactionThreshold: "0.8"     # default 0.5
-    majorCompactionInterval: "10800"    # default 86400 seconds (3 hours vs default 1 day)
-    gcWaitTime: "300000"                # default 900000 milli-seconds (5 minutes vs default 15 minutes)
-    isForceGCAllowWhenNoSpace: "true"   # default false
+    minorCompactionThreshold: "0.2" # default 0.2 (use default)
+    minorCompactionInterval: "360" # default 3600 seconds (6 minutes vs default 1 hour)
+    majorCompactionThreshold: "0.8" # default 0.5
+    majorCompactionInterval: "10800" # default 86400 seconds (3 hours vs default 1 day)
+    gcWaitTime: "300000" # default 900000 milli-seconds (5 minutes vs default 15 minutes)
+    isForceGCAllowWhenNoSpace: "true" # default false
     # disk utilization configuration
     # https://bookkeeper.apache.org/docs/reference/config#disk-utilization
     # Make sure that diskUsageLwmThreshold <= diskUsageWarnThreshold <= diskUsageThreshold
-    diskUsageLwmThreshold: "0.85"   # default 0.90
-    diskUsageWarnThreshold: "0.9"   # default 0.95
-    diskUsageThreshold: "0.95"      # default 0.95 (use default)
-    diskCheckInterval: "1800"       # default 10000
+    diskUsageLwmThreshold: "0.85" # default 0.90
+    diskUsageWarnThreshold: "0.9" # default 0.95
+    diskUsageThreshold: "0.95" # default 0.95 (use default)
+    diskCheckInterval: "1800" # default 10000
 
   ## Add a custom command to the start up process of the bookie pods (e.g. update-ca-certificates, jvm commands, etc)
   additionalCommand:
@@ -703,14 +680,14 @@ autorecovery:
     interval: 60s
     scrapeTimeout: 60s
     metricRelabelings:
-      # - action: labeldrop
-      #   regex: cluster
+    # - action: labeldrop
+    #   regex: cluster
   # True includes annotation for statefulset that contains hash of corresponding configmap, which will cause pods to restart on configmap change
   restartPodsOnConfigMapChange: false
   ports:
     http: 8000
   # nodeSelector:
-    # cloud.google.com/gke-nodepool: default-pool
+  # cloud.google.com/gke-nodepool: default-pool
   affinity:
     anti_affinity: true
     anti_affinity_topology_key: kubernetes.io/hostname
@@ -772,19 +749,19 @@ pulsar_metadata:
 #      memory: 512Mi
 #      cpu: 1
 
-  ## optional you can specify tolerations and nodeSelectors for all init jobs (pulsar-init & bookkeeper-init)
-  # tolerations: []
-  #   - key: "someKey"
-  #     operator: "Equal"
-  #     value: "someValue"
-  #     effect: "NoSchedule"
-  # nodeSelector: {}
-  #   cloud.google.com/gke-nodepool: default-pool
+## optional you can specify tolerations and nodeSelectors for all init jobs (pulsar-init & bookkeeper-init)
+# tolerations: []
+#   - key: "someKey"
+#     operator: "Equal"
+#     value: "someValue"
+#     effect: "NoSchedule"
+# nodeSelector: {}
+#   cloud.google.com/gke-nodepool: default-pool
 
-  ## optional, you can provide your own zookeeper metadata store for other components
-  # to use this, you should explicit set components.zookeeper to false
-  #
-  # userProvidedZookeepers: "zk01.example.com:2181,zk02.example.com:2181"
+## optional, you can provide your own zookeeper metadata store for other components
+# to use this, you should explicit set components.zookeeper to false
+#
+# userProvidedZookeepers: "zk01.example.com:2181,zk02.example.com:2181"
 
 # Can be used to run extra commands in the initialization jobs e.g. to quit istio sidecars etc.
 extraInitCommand: ""
@@ -809,8 +786,8 @@ broker:
     interval: 60s
     scrapeTimeout: 60s
     metricRelabelings:
-      # - action: labeldrop
-      #   regex: cluster
+    # - action: labeldrop
+    #   regex: cluster
   # True includes annotation for statefulset that contains hash of corresponding configmap, which will cause pods to restart on configmap change
   restartPodsOnConfigMapChange: false
   ports:
@@ -819,7 +796,7 @@ broker:
     pulsar: 6650
     pulsarssl: 6651
   # nodeSelector:
-    # cloud.google.com/gke-nodepool: default-pool
+  # cloud.google.com/gke-nodepool: default-pool
   probe:
     liveness:
       enabled: true
@@ -871,11 +848,11 @@ broker:
   extraVolumes: []
   extraVolumeMounts: []
   extreEnvs: []
-#    - name: POD_NAME
-#      valueFrom:
-#        fieldRef:
-#          apiVersion: v1
-#          fieldPath: metadata.name
+  #    - name: POD_NAME
+  #      valueFrom:
+  #        fieldRef:
+  #          apiVersion: v1
+  #          fieldPath: metadata.name
   ## Broker configmap
   ## templates/broker-configmap.yaml
   ## Keys in broker.conf can be overridden here. Use PULSAR_PREFIX_ to add keys to broker.conf.
@@ -885,20 +862,7 @@ broker:
     PULSAR_MEM: >
       -Xms128m -Xmx256m -XX:MaxDirectMemorySize=256m
     PULSAR_GC: >
-      -XX:+UseG1GC
-      -XX:MaxGCPauseMillis=10
-      -Dio.netty.leakDetectionLevel=disabled
-      -Dio.netty.recycler.linkCapacity=1024
-      -XX:+ParallelRefProcEnabled
-      -XX:+UnlockExperimentalVMOptions
-      -XX:+DoEscapeAnalysis
-      -XX:ParallelGCThreads=4
-      -XX:ConcGCThreads=4
-      -XX:G1NewSizePercent=50
-      -XX:+DisableExplicitGC
-      -XX:-ResizePLAB
-      -XX:+ExitOnOutOfMemoryError
-      -XX:+PerfDisableSharedMem
+      -XX:+UseG1GC -XX:MaxGCPauseMillis=10 -Dio.netty.leakDetectionLevel=disabled -Dio.netty.recycler.linkCapacity=1024 -XX:+ParallelRefProcEnabled -XX:+UnlockExperimentalVMOptions -XX:+DoEscapeAnalysis -XX:ParallelGCThreads=4 -XX:ConcGCThreads=4 -XX:G1NewSizePercent=50 -XX:+DisableExplicitGC -XX:-ResizePLAB -XX:+ExitOnOutOfMemoryError -XX:+PerfDisableSharedMem
     managedLedgerDefaultEnsembleSize: "1"
     managedLedgerDefaultWriteQuorum: "1"
     managedLedgerDefaultAckQuorum: "1"
@@ -926,93 +890,93 @@ broker:
   ## templates/broker-service-account.yaml
   service_account:
     annotations: {}
-      ## You may use the following annotation in order to use EKS IAM Roles for Service Accounts (IRSA)
-      # eks.amazonaws.com/role-arn: arn:aws:iam::66666:role/my-iam-role-with-s3-access
+    ## You may use the following annotation in order to use EKS IAM Roles for Service Accounts (IRSA)
+    # eks.amazonaws.com/role-arn: arn:aws:iam::66666:role/my-iam-role-with-s3-access
   ## Tiered Storage
   ##
   storageOffload: {}
-    ## General
-    ## =======
-    # maxBlockSizeInBytes: "64000000"
-    # readBufferSizeInBytes: "1000000"
-    ## The following are default values for the cluster. They can be changed
-    ## on each namespace.
-    # managedLedgerOffloadDeletionLagMs: "14400000"
-    # managedLedgerOffloadAutoTriggerSizeThresholdBytes: "-1" # disabled
+  ## General
+  ## =======
+  # maxBlockSizeInBytes: "64000000"
+  # readBufferSizeInBytes: "1000000"
+  ## The following are default values for the cluster. They can be changed
+  ## on each namespace.
+  # managedLedgerOffloadDeletionLagMs: "14400000"
+  # managedLedgerOffloadAutoTriggerSizeThresholdBytes: "-1" # disabled
 
-    ## For AWS S3
-    ## ======
-    ## Either you must create an IAM account with access to the bucket and
-    ## generate keys for that account, or use IAM Roles for Service Accounts (IRSA)
-    ## (example on `.Value.broker.service_account.annotations` section above)
-    ##
-    # driver: aws-s3
-    # bucket: <bucket>
-    # region: <region>
-    ## Secret that stores AWS credentials, using the following command:
-    ## ```
-    ## kubectl -n pulsar create secret generic \
-    ##   --from-literal=AWS_ACCESS_KEY_ID=<AWS ACCESS KEY> \
-    ##   --from-literal=AWS_SECRET_ACCESS_KEY=<AWS SECRET KEY> \
-    ##   <secret name>
-    ## ```
-    # secret: <secret name> # [k8s secret name that stores AWS credentials]
+  ## For AWS S3
+  ## ======
+  ## Either you must create an IAM account with access to the bucket and
+  ## generate keys for that account, or use IAM Roles for Service Accounts (IRSA)
+  ## (example on `.Value.broker.service_account.annotations` section above)
+  ##
+  # driver: aws-s3
+  # bucket: <bucket>
+  # region: <region>
+  ## Secret that stores AWS credentials, using the following command:
+  ## ```
+  ## kubectl -n pulsar create secret generic \
+  ##   --from-literal=AWS_ACCESS_KEY_ID=<AWS ACCESS KEY> \
+  ##   --from-literal=AWS_SECRET_ACCESS_KEY=<AWS SECRET KEY> \
+  ##   <secret name>
+  ## ```
+  # secret: <secret name> # [k8s secret name that stores AWS credentials]
 
-    ## For S3 Compatible
-    ## =================
-    ## Need to create access and secret key for S3 compatible service
-    #
-    # driver: aws-s3
-    # bucket: <bucket>
-    # region: <region>
-    # serviceEndpoint: host:port
-    ## Secret that stores AWS credentials, using the following command:
-    ## ```
-    ## kubectl -n pulsar create secret generic \
-    ##   --from-literal=AWS_ACCESS_KEY_ID=<AWS ACCESS KEY> \
-    ##   --from-literal=AWS_SECRET_ACCESS_KEY=<AWS SECRET KEY> \
-    ##   <aws secret name>
-    ## ```
-    # secret: <aws secret name> # [k8s secret name that stores AWS credentials]
+  ## For S3 Compatible
+  ## =================
+  ## Need to create access and secret key for S3 compatible service
+  #
+  # driver: aws-s3
+  # bucket: <bucket>
+  # region: <region>
+  # serviceEndpoint: host:port
+  ## Secret that stores AWS credentials, using the following command:
+  ## ```
+  ## kubectl -n pulsar create secret generic \
+  ##   --from-literal=AWS_ACCESS_KEY_ID=<AWS ACCESS KEY> \
+  ##   --from-literal=AWS_SECRET_ACCESS_KEY=<AWS SECRET KEY> \
+  ##   <aws secret name>
+  ## ```
+  # secret: <aws secret name> # [k8s secret name that stores AWS credentials]
 
-    ## For Azure Blob
-    ## =================
-    ## Need to create an Azure storage account and a blob containter (bucket)
-    ## To retrieve key, see https://docs.microsoft.com/en-us/azure/storage/common/storage-account-keys-manage?tabs=azure-portal#code-try-1
-    #
-    # driver: azureblob
-    # bucket: <bucket>
-    # region: <region>
-    ## Secret that stores AZURE credentials, using the following command:
-    ## ```
-    ## kubectl -n pulsar create secret generic \
-    ##   --from-literal=AZURE_STORAGE_ACCOUNT=<AZURE STORAGE ACCOUNT> \
-    ##   --from-literal=AZURE_STORAGE_ACCESS_KEY=<AZURE STORAGE ACCESS KEY> \
-    ##   <azure secret name>
-    ## ```
-    # secret: <azure secret name> # [k8s secret name that stores AZURE credentials]
+  ## For Azure Blob
+  ## =================
+  ## Need to create an Azure storage account and a blob containter (bucket)
+  ## To retrieve key, see https://docs.microsoft.com/en-us/azure/storage/common/storage-account-keys-manage?tabs=azure-portal#code-try-1
+  #
+  # driver: azureblob
+  # bucket: <bucket>
+  # region: <region>
+  ## Secret that stores AZURE credentials, using the following command:
+  ## ```
+  ## kubectl -n pulsar create secret generic \
+  ##   --from-literal=AZURE_STORAGE_ACCOUNT=<AZURE STORAGE ACCOUNT> \
+  ##   --from-literal=AZURE_STORAGE_ACCESS_KEY=<AZURE STORAGE ACCESS KEY> \
+  ##   <azure secret name>
+  ## ```
+  # secret: <azure secret name> # [k8s secret name that stores AZURE credentials]
 
-    ## For Google Cloud Storage
-    ## ====================
-    ## You must create a service account that has access to the objects in GCP buckets
-    ## and upload its key as a JSON file to a secret.
-    ##
-    ## 1. Go to https://console.cloud.google.com/iam-admin/serviceaccounts
-    ## 2. Select your project.
-    ## 3. Create a new service account.
-    ## 4. Give the service account permission to access the bucket. For example,
-    ##    the "Storage Object Admin" role.
-    ## 5. Create a key for the service account and save it as a JSON file.
-    ## 6. Save the JSON file in a secret:
-    ##       kubectl create secret generic pulsar-gcp-sa-secret \
-    ##          --from-file=google-service-account-key.json \
-    ##          --namespace pulsar
-    ##
-    # driver: google-cloud-storage
-    # bucket: <bucket>
-    # region: <region>
-    # gcsServiceAccountSecret: pulsar-gcp-sa-secret # pragma: allowlist secret
-    # gcsServiceAccountJsonFile: google-service-account-key.json
+  ## For Google Cloud Storage
+  ## ====================
+  ## You must create a service account that has access to the objects in GCP buckets
+  ## and upload its key as a JSON file to a secret.
+  ##
+  ## 1. Go to https://console.cloud.google.com/iam-admin/serviceaccounts
+  ## 2. Select your project.
+  ## 3. Create a new service account.
+  ## 4. Give the service account permission to access the bucket. For example,
+  ##    the "Storage Object Admin" role.
+  ## 5. Create a key for the service account and save it as a JSON file.
+  ## 6. Save the JSON file in a secret:
+  ##       kubectl create secret generic pulsar-gcp-sa-secret \
+  ##          --from-file=google-service-account-key.json \
+  ##          --namespace pulsar
+  ##
+  # driver: google-cloud-storage
+  # bucket: <bucket>
+  # region: <region>
+  # gcsServiceAccountSecret: pulsar-gcp-sa-secret # pragma: allowlist secret
+  # gcsServiceAccountJsonFile: google-service-account-key.json
 
 ## Pulsar: Functions Worker
 ## The Function Worker component runs embedded with the broker
@@ -1051,12 +1015,12 @@ proxy:
     interval: 60s
     scrapeTimeout: 60s
     metricRelabelings:
-      # - action: labeldrop
-      #   regex: cluster
+    # - action: labeldrop
+    #   regex: cluster
   # True includes annotation for statefulset that contains hash of corresponding configmap, which will cause pods to restart on configmap change
   restartPodsOnConfigMapChange: false
   # nodeSelector:
-    # cloud.google.com/gke-nodepool: default-pool
+  # cloud.google.com/gke-nodepool: default-pool
   probe:
     liveness:
       enabled: true
@@ -1108,11 +1072,11 @@ proxy:
   extraVolumes: []
   extraVolumeMounts: []
   extreEnvs: []
-#    - name: POD_IP
-#      valueFrom:
-#        fieldRef:
-#          apiVersion: v1
-#          fieldPath: status.podIP
+  #    - name: POD_IP
+  #      valueFrom:
+  #        fieldRef:
+  #          apiVersion: v1
+  #          fieldPath: status.podIP
   ## Proxy service account
   ## templates/proxy-service-account.yaml
   service_account:
@@ -1124,20 +1088,7 @@ proxy:
     PULSAR_MEM: >
       -Xms64m -Xmx64m -XX:MaxDirectMemorySize=64m
     PULSAR_GC: >
-      -XX:+UseG1GC
-      -XX:MaxGCPauseMillis=10
-      -Dio.netty.leakDetectionLevel=disabled
-      -Dio.netty.recycler.linkCapacity=1024
-      -XX:+ParallelRefProcEnabled
-      -XX:+UnlockExperimentalVMOptions
-      -XX:+DoEscapeAnalysis
-      -XX:ParallelGCThreads=4
-      -XX:ConcGCThreads=4
-      -XX:G1NewSizePercent=50
-      -XX:+DisableExplicitGC
-      -XX:-ResizePLAB
-      -XX:+ExitOnOutOfMemoryError
-      -XX:+PerfDisableSharedMem
+      -XX:+UseG1GC -XX:MaxGCPauseMillis=10 -Dio.netty.leakDetectionLevel=disabled -Dio.netty.recycler.linkCapacity=1024 -XX:+ParallelRefProcEnabled -XX:+UnlockExperimentalVMOptions -XX:+DoEscapeAnalysis -XX:ParallelGCThreads=4 -XX:ConcGCThreads=4 -XX:G1NewSizePercent=50 -XX:+DisableExplicitGC -XX:-ResizePLAB -XX:+ExitOnOutOfMemoryError -XX:+PerfDisableSharedMem
     httpNumThreads: "8"
   ## Add a custom command to the start up process of the proxy pods (e.g. update-ca-certificates, jvm commands, etc)
   additionalCommand:
@@ -1202,7 +1153,7 @@ toolset:
   # True includes annotation for statefulset that contains hash of corresponding configmap, which will cause pods to restart on configmap change
   restartPodsOnConfigMapChange: false
   # nodeSelector:
-    # cloud.google.com/gke-nodepool: default-pool
+  # cloud.google.com/gke-nodepool: default-pool
   annotations: {}
   tolerations: []
   gracePeriod: 30
@@ -1232,9 +1183,7 @@ toolset:
   ##
   configData:
     PULSAR_MEM: >
-      -Xms64M
-      -Xmx128M
-      -XX:MaxDirectMemorySize=128M
+      -Xms64M -Xmx128M -XX:MaxDirectMemorySize=128M
   ## Add a custom command to the start up process of the toolset pods (e.g. update-ca-certificates, jvm commands, etc)
   additionalCommand:
 
@@ -1364,8 +1313,8 @@ pulsar_manager:
       # storageClassName: existent-storage-class,
       ## If you want to bind static persistent volumes via selectors, e.g.:
       # selector:
-        # matchLabels:
-        # app: pulsar-bookkeeper-journal
+      # matchLabels:
+      # app: pulsar-bookkeeper-journal
       selector: {}
   ## Pulsar manager service
   ## templates/pulsar-manager-service.yaml
@@ -1416,9 +1365,9 @@ pulsar_manager:
     ## UI_USERNAME: <UI username>
     existingSecret: ""
     ui_username: "pulsar"
-    ui_password: ""  # leave empty for random password
+    ui_password: "" # leave empty for random password
     db_username: "pulsar"
-    db_password: ""  # leave empty for random password
+    db_password: "" # leave empty for random password
 
 # These are jobs where job ttl configuration is used
 # pulsar-helm-chart/charts/pulsar/templates/pulsar-cluster-initialize.yaml

@@ -1,7 +1,7 @@
 variable "name" {
   description = "The name of the deployment"
   type        = string
-  default     = "worker"
+  default     = "worker-node-go"
 }
 
 variable "replicas" {
@@ -13,7 +13,7 @@ variable "replicas" {
 variable "namespace" {
   description = "The namespace to deploy the worker nodes"
   type        = string
-  default     = "default"
+  default     = "worker-node-go"
 }
 
 variable "image" {

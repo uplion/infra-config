@@ -1,13 +1,13 @@
-resource "kubernetes_namespace_v1" "workers" {
+resource "kubernetes_namespace_v1" "workers_go" {
   metadata {
     name = var.namespace
   }
 }
 
-resource "kubernetes_service_v1" "workers" {
+resource "kubernetes_service_v1" "workers_go" {
   metadata {
     name      = var.name
-    namespace = kubernetes_namespace_v1.workers.metadata.0.name
+    namespace = kubernetes_namespace_v1.workers_go.metadata.0.name
     labels = {
       app     = var.name
       service = var.name
@@ -15,7 +15,7 @@ resource "kubernetes_service_v1" "workers" {
   }
   spec {
     selector = {
-      app = kubernetes_deployment_v1.workers.metadata[0].labels.app
+      app = kubernetes_deployment_v1.workers_go.metadata[0].labels.app
     }
     port {
       name        = "http"
@@ -25,20 +25,25 @@ resource "kubernetes_service_v1" "workers" {
   }
 }
 
-resource "kubernetes_service_account_v1" "workers" {
+resource "kubernetes_service_account_v1" "workers_go" {
   metadata {
     name      = var.name
-    namespace = kubernetes_namespace_v1.workers.metadata[0].name
+    namespace = kubernetes_namespace_v1.workers_go.metadata[0].name
     labels = {
       account = var.name
     }
   }
 }
 
-resource "kubernetes_deployment_v1" "workers" {
+
+
+resource "kubernetes_deployment_v1" "workers_go" {
   metadata {
     name      = var.name
-    namespace = kubernetes_namespace_v1.workers.metadata[0].name
+    namespace = kubernetes_namespace_v1.workers_go.metadata[0].name
+    labels = {
+      app = var.name
+    }
   }
 
   spec {
@@ -58,7 +63,7 @@ resource "kubernetes_deployment_v1" "workers" {
       }
 
       spec {
-        service_account_name = kubernetes_service_account_v1.workers.metadata.0.name
+        service_account_name = kubernetes_service_account_v1.workers_go.metadata.0.name
         container {
           name  = var.name
           image = var.image

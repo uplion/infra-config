@@ -1,0 +1,6 @@
+api_host: main-api-service.main-api-service.svc.cluster.local
+api_port: 80
+chat_host: frontend.frontend.svc.cluster.local
+chat_port: 80
+admin_host: admin-panel.admin-panel.svc.cluster.local
+admin_port: 80

@@ -30,22 +30,22 @@ spec:
         exact: /admin
     route:
     - destination:
-        host: admin-panel.admin-panel.svc.cluster.local # TODO: Update this to user-defined
+        host: {.Values.admin_host: ''}
         port:
-          number: 80
+          number: {.Values.admin_port: 80}
   - match:
     - uri:
         prefix: /api
     route:
     - destination:
-        host: main-api-service.main-api-service.svc.cluster.local # TODO: Update this to user-defined
+        host: {.Values.api_host: ''}
         port:
-          number: 80
+          number: {.Values.api_port: 80}
   - match:
     - uri:
         exact: /chat
     route:
     - destination:
-        host: frontend.frontend.svc.cluster.local # TODO: update this to user-defined
+        host: {.Values.chat_host: ''}
         port:
-          number: 80
+          number: {.Values.chat_port: 80}
