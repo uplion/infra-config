@@ -71,7 +71,8 @@ Then, we can deploy the resources using `terraform apply` command:
 terraform apply -auto-approve
 ```
 
-The application may be failed, and in that case, you can just run `terraform apply -auto-approve` again to fix the issue in most scenarios.
+> [!WARNING]
+> The application may be failed, and in that case, you can just run `terraform apply -auto-approve` again to fix the issue in most scenarios.
 
 ### Destroy
 
@@ -80,7 +81,7 @@ Destroy the resources to avoid unnecessary charges.
 ```bash
 terraform destroy -auto-approve
 ```
-
+<!-- 
 ## Partial Tests
 
 ### Istio
@@ -195,7 +196,7 @@ postgres=> \dconfig
 You should see the postgres configurations on the remote.
 
 ### Pulsar 
-<!-- TODO to be tested -->
+TODO to be tested
 
 0. Prerequirity: [pulsarcli](https://github.com/streamnative/pulsarctl)
 
@@ -215,16 +216,16 @@ kubectl port-forward svc/pulsar-local-proxy -n pulsar 6650:6650
 pulsarctl topic list
 ```
 
-<!-- TODO configure pulsar manager & grafana -->
+TODO configure pulsar manager & grafana
 
 ### Main API Service
 
-<!-- TODO add main-api-service test -->
+TODO add main-api-service test
 
 ### AI Model Operator
 
 - See Lab Test Video 
-<!-- TODO to be configured -->
+TODO to be configured
 
 ### Admin Panel
 
@@ -262,11 +263,11 @@ For more detailed instructions, refer to the [Frontend Repository](https://githu
 
 ### Ingress Gateway
 
-<!-- TODO add ingress gateway test -->
+TODO add ingress gateway test
 
 ### Overall
 
-- 
+-  -->
 
 ## License
 

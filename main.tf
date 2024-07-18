@@ -333,9 +333,9 @@ module "admin_panel" {
   postgres_config = {
     username = "postgres"
     password = "GO)Ns6]Tp3Z$TbW1"
-    host     = "postgresql-ha-pgbouncer.postgresql-ha.svc.cluster.local"
+    host     = "postgresql-ha-pgpool.postgresql-ha.svc.cluster.local"
     port     = 5432
-    dbname   = "api_server"
+    dbname   = "uplion"
   }
 
   # postgres_config = {

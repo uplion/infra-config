@@ -46,7 +46,7 @@ resource "helm_release" "postgresql_ha" {
           postgresql = {
             username       = "postgres"
             password       = "GO)Ns6]Tp3Z$TbW1"
-            database       = "api_server"
+            database       = "uplion"
             repmgrUsername = "repmgr"
             repmgrPassword = "uae->A_{I-oygQKG"
           }
