@@ -167,31 +167,31 @@ module "local_path_provisioner" {
 ################################################################################
 # PostgreSQL
 ################################################################################
-module "postgresql_ha" {
-  source = "./modules/postgresql_ha"
-  depends_on = [
-    module.eks,
-    module.local_path_provisioner,
-    module.pulsar
-  ]
-  name               = "postgresql-ha"
-  namespace          = "postgresql-ha"
-  storage_class_name = "local-path"
-}
-# module "postgres_operator" {
-#   source = "./operators/postgres_operator"
-#   #   depends_on = [module.pulsar]
-
-#   postgres_operator_name      = "postgres-operator"
-#   postgres_operator_namespace = "postgres-operator"
-#   postgres_name               = "postgres-ha"
-#   postgres_namespace          = "postgres-operator"
-#   postgres_replicas           = 2
-#   postgres_storage_size       = "1Gi"
-#   postgres_storage_class_name = "local-path"
-#   username                    = "postgres"
-#   dbname                      = "uplion"
+# module "postgresql_ha" {
+#   source = "./modules/postgresql_ha"
+#   depends_on = [
+#     module.eks,
+#     module.local_path_provisioner,
+#     module.pulsar
+#   ]
+#   name               = "postgresql-ha"
+#   namespace          = "postgresql-ha"
+#   storage_class_name = "local-path"
 # }
+module "postgres_operator" {
+  source = "./operators/postgres_operator"
+  #   depends_on = [module.pulsar]
+
+  postgres_operator_name      = "postgres-operator"
+  postgres_operator_namespace = "postgres-operator"
+  postgres_name               = "postgres-ha"
+  postgres_namespace          = "postgres-operator"
+  postgres_replicas           = 2
+  postgres_storage_size       = "1Gi"
+  postgres_storage_class_name = "local-path"
+  username                    = "postgres"
+  dbname                      = "uplion"
+}
 
 # ################################################################################
 # # Pulsar

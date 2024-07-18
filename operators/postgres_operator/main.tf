@@ -11,6 +11,19 @@ resource "helm_release" "postgres_operator" {
   create_namespace = true
 }
 
+resource "kubernetes_config_map_v1" "postgres_init_sql" {
+  metadata {
+    name      = "${var.postgres_name}-pg-init-sql"
+    namespace = var.postgres_operator_namespace
+  }
+
+  data = {
+    "init.sql" = "${file("${path.module}/init.sql")}"
+  }
+
+  depends_on = [helm_release.postgres_operator]
+}
+
 resource "helm_release" "postgres_ha" {
   name            = var.postgres_name
   chart           = "${path.root}/charts/postgres"
@@ -19,7 +32,7 @@ resource "helm_release" "postgres_ha" {
   namespace        = var.postgres_namespace
   create_namespace = true
 
-  depends_on = [helm_release.postgres_operator]
+  depends_on = [helm_release.postgres_operator, kubernetes_config_map_v1.postgres_init_sql]
 
   values = [
     yamlencode({
@@ -112,6 +125,10 @@ resource "helm_release" "postgres_ha" {
         # }
         # options = "'SUPERUSER'"
       }]
+      databaseInitSQL = {
+        key  = "init.sql"
+        name = "${var.postgres_name}-pg-init-sql"
+      }
     })
   ]
 }
