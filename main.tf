@@ -364,7 +364,7 @@ module "frontend" {
   }
 
   openai_host = "main-api-service.main-api-service.svc.cluster.local"
-  openai_port = 3001
+  openai_port = 3000
 }
 
 # ################################################################################
