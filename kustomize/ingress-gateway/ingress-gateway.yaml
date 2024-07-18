@@ -34,12 +34,12 @@ spec:
   http:
   - match:
     - uri:
-        exact: /admin
+        prefix: /admin
     route:
     - destination:
         host: admin-panel.admin-panel.svc.cluster.local # TODO: Update this to user-defined
         port:
-          number: 80
+          number: 3000
   - match:
     - uri:
         prefix: /api
@@ -47,12 +47,12 @@ spec:
     - destination:
         host: main-api-service.main-api-service.svc.cluster.local # TODO: Update this to user-defined
         port:
-          number: 80
-  # - match:
-  #   - uri:
-  #       exact: /chat
-  #   route:
-  #   - destination:
-  #       host: frontend.frontend.svc.cluster.local # TODO: update this to user-defined
-  #       port:
-  #         number: 80
+          number: 8081
+  - match:
+    - uri:
+        prefix: /
+    route:
+    - destination:
+        host: frontend.frontend.svc.cluster.local # TODO: update this to user-defined
+        port:
+          number: 3000

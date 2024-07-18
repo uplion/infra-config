@@ -106,6 +106,7 @@ resource "kubernetes_deployment_v1" "admin_panel" {
 
           port {
             container_port = 3000
+            host_port      = 3000
           }
 
           env {

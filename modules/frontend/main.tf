@@ -21,8 +21,8 @@ resource "kubernetes_service_v1" "frontend" {
 
     port {
       name        = "http"
-      port        = 3001
-      target_port = 3001
+      port        = 3000
+      target_port = 3000
     }
   }
 }
@@ -72,12 +72,12 @@ resource "kubernetes_deployment_v1" "frontend" {
 
           port {
             container_port = 3000
-            host_port      = 3001
+            host_port      = 3000
           }
 
           env {
             name  = "OPENAI_BASE_URL"
-            value = "http://${var.openai_host}/api/v1"
+            value = "http://${var.openai_host}:${var.openai_port}/api/v1"
           }
 
           image_pull_policy = "IfNotPresent"

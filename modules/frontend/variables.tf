@@ -33,3 +33,9 @@ variable "openai_host" {
   type        = string
   default     = "api.openai.com"
 }
+
+variable "openai_port" {
+  description = "The port of the OpenAI API"
+  type        = number
+  default     = 443
+}

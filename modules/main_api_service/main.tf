@@ -175,8 +175,8 @@ resource "kubernetes_service_v1" "main_api_service_headless" {
     }
     cluster_ip = "None"
     port {
-      port        = 80
-      target_port = 8080
+      port        = 8081
+      target_port = 8081
     }
   }
 }

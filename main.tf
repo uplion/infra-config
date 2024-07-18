@@ -351,20 +351,21 @@ module "admin_panel" {
 # # Frontend
 # ################################################################################
 
-# module "frontend" {
-#   source     = "./modules/frontend"
-#   depends_on = [module.main_api_service]
+module "frontend" {
+  source     = "./modules/frontend"
+  depends_on = [module.main_api_service]
 
-#   name      = "frontend"
-#   namespace = "frontend"
-#   replicas  = 3
-#   resource = {
-#     cpu    = "100m"
-#     memory = "256Mi"
-#   }
+  name      = "frontend"
+  namespace = "frontend"
+  replicas  = 3
+  resource = {
+    cpu    = "100m"
+    memory = "256Mi"
+  }
 
-#   openai_host = "main-api-service.main-api-service.svc.cluster.local"
-# }
+  openai_host = "main-api-service.main-api-service.svc.cluster.local"
+  openai_port = 3001
+}
 
 # ################################################################################
 # # AI Models
