@@ -20,7 +20,7 @@ resource "helm_release" "pulsar" {
   dependency_update = true
 
   depends_on = [null_resource.prepare_helm_release]
-
+  timeout    = "10m"
 
   values = [yamlencode({
     volumes = {
