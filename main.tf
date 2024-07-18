@@ -66,7 +66,7 @@ module "eks" {
     # aws-ebs-csi-driver     = {}
   }
 
-  node_instance_types = ["t3.large"]
+  node_instance_types = ["c5a.xlarge"]
   node_group_scaling_config = {
     desired_size = 10
     max_size     = 15
@@ -307,7 +307,7 @@ module "main_api_service" {
   source = "./modules/main_api_service"
   #   depends_on = [module.pulsar]
 
-  replicas           = 3
+  replicas           = 30
   pulsar_url         = local.pulsar_url
   storage_class_name = "local-path"
 
@@ -364,7 +364,7 @@ module "frontend" {
   }
 
   openai_host = "main-api-service.main-api-service.svc.cluster.local"
-  openai_port = 3000
+  openai_port = 8080
 }
 
 # ################################################################################

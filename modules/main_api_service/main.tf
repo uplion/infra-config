@@ -54,7 +54,7 @@ resource "kubernetes_stateful_set_v1" "main_api_services" {
 
           port {
             container_port = 8080
-            host_port      = 8081
+            host_port      = 8080
           }
 
           resources { # TODO to be configured
@@ -74,11 +74,11 @@ resource "kubernetes_stateful_set_v1" "main_api_services" {
           #     mount_path = "/etc/config"
           #   }
 
-          volume_mount {
-            name       = "main-api-services-data"
-            mount_path = "/etc/main-api-services/data"
-            sub_path   = ""
-          }
+          #   volume_mount {
+          #     name       = "main-api-services-data"
+          #     mount_path = "/etc/main-api-services/data"
+          #     sub_path   = ""
+          #   }
 
           #   readiness_probe {
           #     http_get {
@@ -122,27 +122,27 @@ resource "kubernetes_stateful_set_v1" "main_api_services" {
       }
     }
 
-    volume_claim_template {
-      metadata {
-        name = "main-api-services-data"
-      }
+    # volume_claim_template {
+    #   metadata {
+    #     name = "main-api-services-data"
+    #   }
 
-      spec {
-        access_modes       = ["ReadWriteOnce"]
-        storage_class_name = var.storage_class_name
+    #   spec {
+    #     access_modes       = ["ReadWriteOnce"]
+    #     storage_class_name = var.storage_class_name
 
-        resources {
-          requests = {
-            storage = "1000Mi"
-          }
-        }
-      }
-    }
+    #     resources {
+    #       requests = {
+    #         storage = "1000Mi"
+    #       }
+    #     }
+    #   }
+    # }
 
-    persistent_volume_claim_retention_policy {
-      when_deleted = "Delete"
-      when_scaled  = "Delete"
-    }
+    # persistent_volume_claim_retention_policy {
+    #   when_deleted = "Delete"
+    #   when_scaled  = "Delete"
+    # }
   }
 }
 
@@ -158,8 +158,8 @@ resource "kubernetes_service_v1" "main_api_service" {
     }
 
     port {
-      port        = 8081
-      target_port = 8081
+      port        = 8080
+      target_port = 8080
     }
   }
 }

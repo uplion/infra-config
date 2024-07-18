@@ -117,6 +117,16 @@ resource "kubernetes_deployment_v1" "admin_panel" {
             value = "yiwencai/uplion-worker-node-go:latest"
           }
 
+          env {
+            name  = "REPLICAS"
+            value = 30
+          }
+
+          #   env {
+          #     name  = "MSG_BACKLOG_THRESHOLD"
+          #     value = 2
+          #   }
+
           #   liveness_probe {
           #     http_get {
           #       path = "/"

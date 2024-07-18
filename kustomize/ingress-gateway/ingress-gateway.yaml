@@ -47,7 +47,7 @@ spec:
     - destination:
         host: main-api-service.main-api-service.svc.cluster.local # TODO: Update this to user-defined
         port:
-          number: 8081
+          number: 8080
   - match:
     - uri:
         prefix: /

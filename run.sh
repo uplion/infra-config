@@ -1,7 +1,7 @@
 #!/bin/bash
 # rm terraform.tfstate*
 
-
+git pull origin main
 if [ $1 == "terraform" ]; then
     terraform init
     if [ $? -ne 0 ]; then
