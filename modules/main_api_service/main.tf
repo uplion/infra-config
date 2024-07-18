@@ -54,6 +54,7 @@ resource "kubernetes_stateful_set_v1" "main_api_services" {
 
           port {
             container_port = 8080
+            host_port      = 8081
           }
 
           resources { # TODO to be configured
@@ -157,15 +158,16 @@ resource "kubernetes_service_v1" "main_api_service" {
     }
 
     port {
-      port        = 80
-      target_port = 8080
+      port        = 8081
+      target_port = 8081
     }
   }
 }
 
 resource "kubernetes_service_v1" "main_api_service_headless" {
   metadata {
-    name = "main-api-service-headless"
+    name      = "main-api-service-headless"
+    namespace = var.namespace
   }
   spec {
     selector = {

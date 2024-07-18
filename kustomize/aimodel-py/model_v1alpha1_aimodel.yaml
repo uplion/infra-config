@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: aimodel-py
+---
+apiVersion: model.youxam.com/v1alpha1
+kind: AIModel
+metadata:
+  labels:
+    app.kubernetes.io/name: aimodel
+    app.kubernetes.io/instance: aimodel-sample
+    app.kubernetes.io/part-of: aimodel-operator
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: aimodel-operator
+  name: aimodel-py-sample
+  namespace: aimodel-py
+spec:
+  type: local
+  model: TinyLlama-1.1B
+  replicas: 3
+  image: yiwencai/workernode:latest
+

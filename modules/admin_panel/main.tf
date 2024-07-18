@@ -19,7 +19,7 @@ resource "kubernetes_service_v1" "admin_panel" {
     }
     port {
       name        = "http"
-      port        = 80
+      port        = 3000
       target_port = 3000
     }
   }
@@ -32,6 +32,38 @@ resource "kubernetes_service_account_v1" "admin_panel" {
     labels = {
       account = var.name
     }
+  }
+}
+
+resource "kubernetes_role_v1" "admin_panel" {
+  metadata {
+    name      = var.name
+    namespace = kubernetes_namespace_v1.admin_panel.metadata.0.name
+  }
+
+  rule {
+    api_groups = ["model.youxam.com"]
+    resources  = ["aimodel"]
+    verbs      = ["*"]
+  }
+}
+
+resource "kubernetes_role_binding_v1" "admin_panel" {
+  metadata {
+    name      = var.name
+    namespace = kubernetes_namespace_v1.admin_panel.metadata.0.name
+  }
+
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "Role"
+    name      = kubernetes_role_v1.admin_panel.metadata.0.name
+  }
+
+  subject {
+    kind      = "ServiceAccount"
+    name      = kubernetes_service_account_v1.admin_panel.metadata.0.name
+    namespace = kubernetes_namespace_v1.admin_panel.metadata.0.name
   }
 }
 
@@ -78,7 +110,7 @@ resource "kubernetes_deployment_v1" "admin_panel" {
 
           env {
             name  = "DATABASE_URL"
-            value = "postgresql://${var.postgres_config.username}:${var.postgres_config.password}@${var.postgres_config.host}:${var.postgres_config.port}/${var.postgres_config.dbname}"
+            value = "postgresql://${var.postgres_config.username}:${var.postgres_config.password}@${var.postgres_config.host}:${var.postgres_config.port}/${var.postgres_config.dbname}?schema=public"
           }
 
           #   liveness_probe {

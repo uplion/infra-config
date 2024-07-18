@@ -151,3 +151,18 @@ provider "registry.terraform.io/kbst/kustomization" {
     "zh:f397be4632e06e4766cc38607a93b4606941a1940afc8a48aa5222384886fa82",
   ]
 }
+
+provider "registry.terraform.io/metio/k8s" {
+  version     = "2024.7.15"
+  constraints = "2024.7.15"
+  hashes = [
+    "h1:PGp/GmGQU0PLlIeq3I+b2LFSlfYKD7QrD0T2Z+Q4lVc=",
+    "zh:0a955cd8c83e73831c0f11cf2d1d5850c20d3359e469f8e829ced55914e25c45",
+    "zh:26b44040f3c0043c0bb69e25971e016ee9e94945726228f7db3ac6cfd2d9aa98",
+    "zh:2f2c7011164df28dd0812c492a7fe8f9d0e5328fbf46f642dc73fc47e619c20a",
+    "zh:5d00637a081f27ef43343910ba79dd11df4ecb0b48edd58bea1da5932aca53b8",
+    "zh:668b81d0bf7ae35bdd88a9eceb2bd65dd64bee3f7d3ee346a202bd30f706d07d",
+    "zh:d1b474a16f9d73bbba9b98db120178f77c8ad440a73e468c7cebcf4cb49601be",
+    "zh:f809ab383cca0a5f83072981c64208cbd7fa67e986a86ee02dd2c82333221e32",
+  ]
+}

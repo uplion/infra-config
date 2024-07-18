@@ -76,6 +76,17 @@ resource "helm_release" "postgres_ha" {
 
       imagePgBouncer = "registry.developers.crunchydata.com/crunchydata/crunchy-pgbouncer:ubi8-1.22-1"
       pgBouncerConfig = {
+        global = {
+          pool_mode                 = "session"
+          ignore_startup_parameters = "extra_float_digits,options"
+          server_reset_query        = "DISCARD ALL"
+          server_reset_query_always = "0"
+          #   server_tls_sslmode        = "require"
+
+          admin_users = "postgres"
+
+
+        }
         affinity = {
           podAntiAffinity = {
             preferredDuringSchedulingIgnoredDuringExecution = [{
@@ -94,11 +105,12 @@ resource "helm_release" "postgres_ha" {
         }
       }
       users = [{
-        databases = [var.dbname]
-        name      = var.username
-        password = {
-          type = "AlphaNumeric"
-        }
+        # databases = [var.dbname]
+        name = "postgres"
+        # password = {
+        #   type = "AlphaNumeric"
+        # }
+        # options = "'SUPERUSER'"
       }]
     })
   ]

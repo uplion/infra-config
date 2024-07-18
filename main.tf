@@ -66,7 +66,12 @@ module "eks" {
     # aws-ebs-csi-driver     = {}
   }
 
-  node_instance_types = ["t3.medium"]
+  node_instance_types = ["t3.large"]
+  node_group_scaling_config = {
+    desired_size = 10
+    max_size     = 15
+    min_size     = 5
+  }
 
   #  EKS K8s API cluster needs to be able to talk with the EKS worker nodes with port 15017/TCP and 15012/TCP which is used by Istio
   #  Istio in order to create sidecar needs to be able to communicate with webhook and for that network passage to EKS is needed.
@@ -147,289 +152,304 @@ module "local_path_provisioner" {
 #   namespace = "redis-cluster"
 # }
 
-module "redis_operator" {
-  source     = "./operators/redis_operator"
-  depends_on = [module.pulsar]
+# module "redis_operator" {
+#   source = "./operators/redis_operator"
+#   #   depends_on = [module.pulsar]
 
-  redis_operator_name      = "redis-operator"
-  redis_name               = "redis-cluster"
-  namespace                = "ot-operators"
-  redis_cluster_size       = 3
-  redis_storage_class_name = "local-path"
-  redis_storage_size       = "1Gi"
-}
+#   redis_operator_name      = "redis-operator"
+#   redis_name               = "redis-cluster"
+#   namespace                = "ot-operators"
+#   redis_cluster_size       = 3
+#   redis_storage_class_name = "local-path"
+#   redis_storage_size       = "1Gi"
+# }
 
 ################################################################################
 # PostgreSQL
 ################################################################################
-# module "postgresql_ha" {
-#   source = "./postgresql_ha_addon"
-#   depends_on = [
-#     module.eks,
-#     module.local_path_provisioner,
-#     module.pulsar
-#   ]
-#   storage_class_name = "local-path"
-# }
-module "postgres_operator" {
-  source     = "./operators/postgres_operator"
-  depends_on = [module.pulsar]
-
-  postgres_operator_name      = "postgres-operator"
-  postgres_operator_namespace = "postgres-operator"
-  postgres_name               = "postgres-ha"
-  postgres_namespace          = "postgres-operator"
-  postgres_replicas           = 2
-  postgres_storage_size       = "1Gi"
-  postgres_storage_class_name = "local-path"
-}
-
-################################################################################
-# Pulsar
-################################################################################
-module "pulsar" {
-  source     = "./modules/pulsar"
-  depends_on = [module.local_path_provisioner]
-
-  cluster_id     = module.eks.cluster_id
-  cluster_name   = module.eks.cluster_name
-  cluster_region = var.region
-
-  # using default values
-  name               = "pulsar-local"
-  namespace          = "pulsar"
+module "postgresql_ha" {
+  source = "./modules/postgresql_ha"
+  depends_on = [
+    module.eks,
+    module.local_path_provisioner,
+    module.pulsar
+  ]
+  name               = "postgresql-ha"
+  namespace          = "postgresql-ha"
   storage_class_name = "local-path"
 }
+# module "postgres_operator" {
+#   source = "./operators/postgres_operator"
+#   #   depends_on = [module.pulsar]
 
-# module "pulsar_operator" {
-#   source = "./operators/pulsar_operator"
-#   depends_on = [
-#     module.eks,
-#     module.local_path_provisioner,
-#     helm_release.cert_manager,
-#     module.pulsar
-#   ]
+#   postgres_operator_name      = "postgres-operator"
+#   postgres_operator_namespace = "postgres-operator"
+#   postgres_name               = "postgres-ha"
+#   postgres_namespace          = "postgres-operator"
+#   postgres_replicas           = 2
+#   postgres_storage_size       = "1Gi"
+#   postgres_storage_class_name = "local-path"
+#   username                    = "postgres"
+#   dbname                      = "uplion"
+# }
+
+# ################################################################################
+# # Pulsar
+# ################################################################################
+# module "pulsar" {
+#   source     = "./modules/pulsar"
+#   depends_on = [module.local_path_provisioner]
+
+#   cluster_id     = module.eks.cluster_id
+#   cluster_name   = module.eks.cluster_name
+#   cluster_region = var.region
 
 #   # using default values
-#   name      = "pulsar-operator"
-#   namespace = "pulsar-operator"
+#   name               = "pulsar-local"
+#   namespace          = "pulsar"
+#   storage_class_name = "local-path"
 # }
 
-################################################################################
-# KEDA
-################################################################################
-resource "helm_release" "keda" {
-  name       = "keda"
-  repository = "https://kedacore.github.io/charts"
-  chart      = "keda"
-  version    = "2.14.2"
+# # module "pulsar_operator" {
+# #   source = "./operators/pulsar_operator"
+# #   depends_on = [
+# #     module.eks,
+# #     module.local_path_provisioner,
+# #     helm_release.cert_manager,
+# #     module.pulsar
+# #   ]
 
-  depends_on = [module.eks]
+# #   # using default values
+# #   name      = "pulsar-operator"
+# #   namespace = "pulsar-operator"
+# # }
 
-  namespace        = "keda"
-  create_namespace = true
+# ################################################################################
+# # KEDA
+# ################################################################################
+# resource "helm_release" "keda" {
+#   name       = "keda"
+#   repository = "https://kedacore.github.io/charts"
+#   chart      = "keda"
+#   version    = "2.14.2"
 
-  values = [yamlencode({
-    podNamespace = "keda"
-  })]
-}
+#   depends_on = [module.eks]
 
-################################################################################
-# Ingress Gateway
-################################################################################
+#   namespace        = "keda"
+#   create_namespace = true
 
-data "kustomization_build" "ingress_gateway_data" {
-  path = "${path.root}/kustomize/ingress-gateway"
-}
+#   values = [yamlencode({
+#     podNamespace = "keda"
+#   })]
+# }
 
-module "ingress_gateway" {
-  source     = "./modules/kustomization_apply"
-  depends_on = [module.main_api_service, module.admin_panel, module.frontend, data.kustomization_build.ingress_gateway_data]
-  providers  = { kustomization = kustomization }
+# ################################################################################
+# # Ingress Gateway
+# ################################################################################
 
-  ids_prio  = data.kustomization_build.ingress_gateway_data.ids_prio
-  manifests = data.kustomization_build.ingress_gateway_data.manifests
-}
+# data "kustomization_build" "ingress_gateway_data" {
+#   path = "${path.root}/kustomize/ingress-gateway"
+# }
 
-data "kubernetes_service_v1" "ingress_gateway" {
-  metadata {
-    name      = "istio-ingressgateway"
-    namespace = "istio-system"
-  }
-  depends_on = [module.ingress_gateway]
-}
+# module "ingress_gateway" {
+#   source     = "./modules/kustomization_apply"
+#   depends_on = [module.main_api_service, module.frontend, data.kustomization_build.ingress_gateway_data]
+#   providers  = { kustomization = kustomization }
+
+#   ids_prio  = data.kustomization_build.ingress_gateway_data.ids_prio
+#   manifests = data.kustomization_build.ingress_gateway_data.manifests
+# }
+
+# data "kubernetes_service_v1" "ingress_gateway" {
+#   metadata {
+#     name      = "istio-ingressgateway"
+#     namespace = "istio-system"
+#   }
+#   depends_on = [module.ingress_gateway]
+# }
 
 
-locals {
-  root_url = "http://${data.kubernetes_service_v1.ingress_gateway.spec.0.cluster_ip}:${data.kubernetes_service_v1.ingress_gateway.spec.0.port.0.port}"
-}
+# locals {
+#   root_url = "http://istio-ingressgateway.istio-system.svc.cluster.local"
+# }
 
-################################################################################
-# AI Model Operator
-################################################################################
+# ################################################################################
+# # AI Model Operator
+# ################################################################################
 
-data "kustomization_build" "ai_model_operator_data" {
-  path = "${path.root}/kustomize/ai-model-operator/default"
-}
+# data "kustomization_build" "ai_model_operator_data" {
+#   path = "${path.root}/kustomize/ai-model-operator/default"
+# }
 
-module "ai_model_operator" {
-  source = "./modules/kustomization_apply"
-  providers = {
-    kustomization = kustomization
-  }
+# module "ai_model_operator" {
+#   source = "./modules/kustomization_apply"
+#   providers = {
+#     kustomization = kustomization
+#   }
 
-  depends_on = [module.pulsar, data.kustomization_build.ai_model_operator_data]
+#   depends_on = [data.kustomization_build.ai_model_operator_data]
 
-  ids_prio  = data.kustomization_build.ai_model_operator_data.ids_prio
-  manifests = data.kustomization_build.ai_model_operator_data.manifests
-}
+#   ids_prio  = data.kustomization_build.ai_model_operator_data.ids_prio
+#   manifests = data.kustomization_build.ai_model_operator_data.manifests
+# }
 
-################################################################################
-# Main API Service
-################################################################################
+# # TODO add aimodels
 
-locals {
-  pulsar_url = "pulsar://pulsar-local-broker.pulsar.svc.cluster.local:6650"
-}
+# ################################################################################
+# # Main API Service
+# ################################################################################
 
-module "main_api_service" {
-  source     = "./modules/main_api_service"
-  depends_on = [module.pulsar]
+# locals {
+#   pulsar_url = "pulsar://pulsar-local-broker.pulsar.svc.cluster.local:6650"
+# }
 
-  replicas           = 3
-  pulsar_url         = local.pulsar_url
-  storage_class_name = "local-path"
+# module "main_api_service" {
+#   source = "./modules/main_api_service"
+#   #   depends_on = [module.pulsar]
 
-  name      = "main-api-service"
-  namespace = "main-api-service"
-}
+#   replicas           = 3
+#   pulsar_url         = local.pulsar_url
+#   storage_class_name = "local-path"
 
-################################################################################
-# Admin Panel
-################################################################################
+#   name      = "main-api-service"
+#   namespace = "main-api-service"
+# }
 
-module "admin_panel" {
-  source     = "./modules/admin_panel"
-  depends_on = [module.postgres_operator]
+# ################################################################################
+# # Admin Panel
+# ################################################################################
 
-  name      = "admin-panel"
-  namespace = "admin-panel"
-  replicas  = 1
-  resource = {
-    cpu    = "100m"
-    memory = "256Mi"
-  }
+# # module "admin_panel" {
+# #   source     = "./modules/admin_panel"
+# #   depends_on = [module.postgres_operator]
 
-  postgres_config = {
-    username = module.postgres_operator.postgres_username
-    password = module.postgres_operator.postgres_password
-    host     = module.postgres_operator.postgres_host
-    port     = module.postgres_operator.postgres_port
-    dbname   = module.postgres_operator.postgres_dbname
-  }
-}
+# #   name      = "admin-panel"
+# #   namespace = "admin-panel"
+# #   replicas  = 1
+# #   resource = {
+# #     cpu    = "100m"
+# #     memory = "256Mi"
+# #   }
+# #   postgres_config = {
+# #     username = "uplion"
+# #     password = "123456"
+# #     host     = "postgres-ha-pgbouncer.postgres-operator.svc.cluster.local"
+# #     port     = 5432
+# #     dbname   = "uplion"
+# #   }
 
-################################################################################
-# Frontend
-################################################################################
+# # postgres_config = {
+# #   username = module.postgres_operator.postgres_username
+# #   password = module.postgres_operator.postgres_password
+# #   host     = module.postgres_operator.postgres_host
+# #   port     = module.postgres_operator.postgres_port
+# #   dbname   = module.postgres_operator.postgres_dbname
+# # }
+# # }
 
-module "frontend" {
-  source     = "./modules/frontend"
-  depends_on = [module.main_api_service]
+# ################################################################################
+# # Frontend
+# ################################################################################
 
-  name      = "frontend"
-  namespace = "frontend"
-  replicas  = 3
-  resource = {
-    cpu    = "100m"
-    memory = "256Mi"
-  }
+# module "frontend" {
+#   source     = "./modules/frontend"
+#   depends_on = [module.main_api_service]
 
-  openai_host = "main-api-service.main-api-service.svc.cluster.local"
-}
+#   name      = "frontend"
+#   namespace = "frontend"
+#   replicas  = 3
+#   resource = {
+#     cpu    = "100m"
+#     memory = "256Mi"
+#   }
 
-################################################################################
-# Worker Nodes
-################################################################################
-module "worker_node_go" {
-  source     = "./modules/worker_node_go"
-  depends_on = [module.pulsar, module.ai_model_operator]
+#   openai_host = "main-api-service.main-api-service.svc.cluster.local"
+# }
 
-  name       = "worker-node-go"
-  namespace  = "worker-node-go"
-  replicas   = 1
-  pulsar_url = local.pulsar_url
-  resource = {
-    cpu    = "100m"
-    memory = "256Mi"
-  }
-}
+# ################################################################################
+# # AI Models
+# ################################################################################
+# data "kustomization_build" "aimodel_go_data" {
+#   path = "${path.root}/kustomize/aimodel-go"
+# }
 
-module "worker_node_py" {
-  source     = "./modules/worker_node_py"
-  depends_on = [module.pulsar, module.ai_model_operator]
+# module "aimodel_go" {
+#   source = "./modules/kustomization_apply"
+#   providers = {
+#     kustomization = kustomization
+#   }
+#   depends_on = [module.ai_model_operator]
 
-  name       = "worker-node-py"
-  namespace  = "worker-node-py"
-  replicas   = 1
-  pulsar_url = local.pulsar_url
-  resource = {
-    cpu    = "100m"
-    memory = "256Mi"
-  }
-}
+#   ids_prio  = data.kustomization_build.aimodel_go_data.ids_prio
+#   manifests = data.kustomization_build.aimodel_go_data.manifests
+# }
 
-################################################################################
-# Test
-################################################################################
-# TODO change to bigger node
-resource "kubernetes_deployment_v1" "pressure_test" {
-  metadata {
-    name = "pressure-test"
-    labels = {
-      app = "pressure-test"
-    }
-  }
+# data "kustomization_build" "aimodel_py_data" {
+#   path = "${path.root}/kustomize/aimodel-py"
+# }
 
-  depends_on = [data.kubernetes_service_v1.ingress_gateway]
-  spec {
-    replicas = 1
+# module "aimodel_py" {
+#   source = "./modules/kustomization_apply"
+#   providers = {
+#     kustomization = kustomization
+#   }
+#   depends_on = [module.ai_model_operator]
 
-    selector {
-      match_labels = {
-        app = "pressure-test"
-      }
-    }
+#   ids_prio  = data.kustomization_build.aimodel_py_data.ids_prio
+#   manifests = data.kustomization_build.aimodel_py_data.manifests
+# }
 
-    template {
-      metadata {
-        labels = {
-          app = "pressure-test"
-        }
-      }
+# ################################################################################
+# # Test
+# ################################################################################
+# # TODO change to bigger node
+# # resource "kubernetes_deployment_v1" "pressure_test" {
+# #   metadata {
+# #     name = "pressure-test"
+# #     labels = {
+# #       app = "pressure-test"
+# #     }
+# #   }
 
-      spec {
-        container {
-          name  = "pressure-test"
-          image = "sherlockedhzoi/pressure-test:lastest"
+# #   depends_on = [data.kubernetes_service_v1.ingress_gateway]
+# #   spec {
+# #     replicas = 1
 
-          resources {
-            limits = {
-              cpu    = "100m"
-              memory = "256Mi"
-            }
-            requests = {
-              cpu    = "100m"
-              memory = "256Mi"
-            }
-          }
+# #     selector {
+# #       match_labels = {
+# #         app = "pressure-test"
+# #       }
+# #     }
 
-          env {
-            name  = "TEST_URL"
-            value = local.root_url
-          }
-        }
-      }
-    }
-  }
-}
+# #     template {
+# #       metadata {
+# #         labels = {
+# #           app = "pressure-test"
+# #         }
+# #       }
+
+# #       spec {
+# #         container {
+# #           name  = "pressure-test"
+# #           image = "sherlockedhzoi/pressure-test:lastest"
+
+# #           resources {
+# #             limits = {
+# #               cpu    = "100m"
+# #               memory = "256Mi"
+# #             }
+# #             requests = {
+# #               cpu    = "100m"
+# #               memory = "256Mi"
+# #             }
+# #           }
+
+# #           env {
+# #             name  = "TEST_URL"
+# #             value = local.root_url
+# #           }
+# #         }
+# #       }
+# #     }
+# #   }
+# # }

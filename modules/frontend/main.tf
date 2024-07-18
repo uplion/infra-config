@@ -21,15 +21,16 @@ resource "kubernetes_service_v1" "frontend" {
 
     port {
       name        = "http"
-      port        = 80
-      target_port = 3000
+      port        = 3001
+      target_port = 3001
     }
   }
 }
 
 resource "kubernetes_service_account_v1" "frontend" {
   metadata {
-    name = var.name
+    name      = var.name
+    namespace = kubernetes_namespace_v1.frontend.metadata.0.name
 
     labels = {
       account = var.name
@@ -39,7 +40,8 @@ resource "kubernetes_service_account_v1" "frontend" {
 
 resource "kubernetes_deployment_v1" "frontend" {
   metadata {
-    name = var.name
+    name      = var.name
+    namespace = kubernetes_namespace_v1.frontend.metadata.0.name
 
     labels = {
       app = var.name
@@ -66,10 +68,11 @@ resource "kubernetes_deployment_v1" "frontend" {
         service_account_name = kubernetes_service_account_v1.frontend.metadata.0.name
         container {
           name  = var.name
-          image = "youxam/uplion-frontend:lastest"
+          image = "youxam/uplion-frontend:latest"
 
           port {
             container_port = 3000
+            host_port      = 3001
           }
 
           env {

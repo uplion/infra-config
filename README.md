@@ -7,13 +7,13 @@
 You must have the following tools installed and available in your `PATH`:
 
 - [terraform](https://developer.hashicorp.com/terraform/install)
-    - could be installed by `winget` or `choco`
 - [aws-cli](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) - `aws` command
 - [kubectl](https://kubernetes.io/docs/tasks/tools/) - If you want to interact with the cluster
 - [jq](https://jqlang.github.io/jq/) - If you are using the AWS Academy Learner Lab & get the `role_arn` by command line
-    - could be installed by `winget` or `choco`
 - [helm](https://helm.sh/zh/docs/intro/quickstart/)
-    - could be installed by `winget` or `choco`
+
+> [!NOTE]
+> All tools above could be installed using `choco` or `winget` on windows (may need to modify name a little bit, like aws-cli into awscli)
 
 ### Configure AWS credentials
 
@@ -53,10 +53,25 @@ Otherwise, you need to create a role with `AmazonEC2ContainerRegistryReadOnly`, 
 
 ### Deploy
 
+First, we need to initialize providers & modules used in the terraform:
+
 ```bash
 terraform init
+```
+
+Then, we can do some basic check using `terraform validate` command:
+
+```bash
+terraform validate
+```
+
+Then, we can deploy the resources using `terraform apply` command:
+
+```bash
 terraform apply -auto-approve
 ```
+
+The application may be failed, and in that case, you can just run `terraform apply -auto-approve` again to fix the issue in most scenarios.
 
 ### Destroy
 
@@ -66,7 +81,7 @@ Destroy the resources to avoid unnecessary charges.
 terraform destroy -auto-approve
 ```
 
-## Example Application
+## Partial Tests
 
 ### Istio
 
@@ -116,6 +131,9 @@ export REDIS_PASSWORD=$(kubectl get secret --namespace redis-cluster redis-clust
 kubectl port-forward svc/redis-cluster -n redis-cluster 6379:6379
 ```
 
+> [!WARNING]
+> If you are running redis or other device at local, do not use the same port since the traffic will collid and redirect to somewhere you don't mean it to be.
+
 3. Start another terminal, connect to redis using redis-cli:
 
 ```bash
@@ -142,41 +160,113 @@ You should see the redis information like `cluster_enabled:1`.
 1. Get postgresql password using command below:
 
 ```bash
-kubectl get secret --namespace postgresql-ha postgresql-ha-postgresql -o jsonpath="{.data.password}" | base64 --decode
+kubectl get secret --namespace postgres-operator postgresql-ha-pguser-test -o jsonpath="{.data.password}" | base64 --decode
 ```
 
-2. Expose redis-cluster service to local port (e.g. 5432):
+2. Expose postgres cluster to local port (e.g. 5432):
 
 ```bash
-kubectl port-forward svc/postgresql-ha-pgpool -n postgresql-ha 5432:5432
+kubectl port-forward svc/postgresql-ha-pgbouncer -n postgres-operator 5432:5432
 ```
 
-3. Start another terminal, connect to redis using redis-cli:
+> [!WARNING]
+> If you are running postgres or other device at local, do not use the same port since the traffic will collid and redirect to somewhere you don't mean it to be.
+
+3. Start another terminal, connect to postgres using psql:
 
 ```bash
-psql api_server -h localhost -p 5432 -U postgres -W
+psql postgres -h localhost -p 5432 -U test -W
 ```
 
-Then input the password you got in step 1.
-If operate successfully, you will see the psql prompt like `api_server=# `.
-
-4. Test redis-cluster:
-
-```
-api_server=# \dconfig
-```
-
-You should see the redis information like `cluster_enabled:1`.
-
-### Pulsar
-
-2. Expose pulsar service to local port (e.g. 5432):
+Then input the password you got in step 1. (Or just do the command follow before using psql to auto input password)
 
 ```bash
-kubectl port-forward svc/pulsar-proxy -n pulsar 6650:6650
+PGPASSWORD=$(kubectl get secret --namespace postgres-operator postgres-ha-pguser-test -o jsonpath="{.data.password}" | base64 --decode)
 ```
 
-3. 
+If operate successfully, you will see the psql prompt like `postgres=> `.
+
+4. Test postgres cluster:
+
+```
+postgres=> \dconfig
+```
+
+You should see the postgres configurations on the remote.
+
+### Pulsar 
+<!-- TODO to be tested -->
+
+0. Prerequirity: [pulsarcli](https://github.com/streamnative/pulsarctl)
+
+
+1. Expose pulsar service to local port (e.g. 6650):
+
+```bash
+kubectl port-forward svc/pulsar-local-proxy -n pulsar 6650:6650
+```
+
+> [!WARNING]
+> If you are running pulsar or other device at local, do not use the same port since the traffic will collid and redirect to somewhere you don't mean it to be.
+
+2. Then you can access pulsar service 
+
+```bash
+pulsarctl topic list
+```
+
+<!-- TODO configure pulsar manager & grafana -->
+
+### Main API Service
+
+<!-- TODO add main-api-service test -->
+
+### AI Model Operator
+
+- See Lab Test Video 
+<!-- TODO to be configured -->
+
+### Admin Panel
+
+1. Expose Admin Panel to localhost:
+```bash
+kubectl port-forward service/admin-panel 3000:3000 -n admin-panel
+```
+
+> [!WARNING]
+> If you are running other device at local, do not use the same port since the traffic will collid and redirect to somewhere you don't mean it to be.
+
+2. Access Admin Panel through browser:
+```bash
+http://localhost:3000/admin
+```
+
+For more detailed instructions, refer to the [Admin Panel Repository](https://github.com/uplion/admin-panel).
+
+### Frontend
+
+1. Expose Admin Panel to localhost:
+```bash
+kubectl port-forward service/frontend 3001:3000 -n frontend
+```
+
+> [!WARNING]
+> If you are running other device at local, do not use the same port since the traffic will collid and redirect to somewhere you don't mean it to be.
+
+2. Access Admin Panel through browser:
+```bash
+http://localhost:3001
+```
+
+For more detailed instructions, refer to the [Frontend Repository](https://github.com/uplion/frontend).
+
+### Ingress Gateway
+
+<!-- TODO add ingress gateway test -->
+
+### Overall
+
+- 
 
 ## License
 
