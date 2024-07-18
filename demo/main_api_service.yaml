@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: main-api-services
+  labels:
+    app: main-api-service
+spec:
+  podManagementPolicy: Parallel
+  replicas: 1
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      app: main-api-service
+  serviceName: main-api-service
+  template:
+    metadata:
+      labels:
+        app: main-api-service
+      annotations: {}
+    spec:
+      containers:
+      - name: main-api-service
+        image: youxam/uplion-main:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: PULSAR_URL
+          value: pulsar://pulsar-local-proxy.pulsar.svc.cluster.local:6650
+        ports:
+        - containerPort: 8080
+        resources:
+          limits:
+            cpu: 200m
+            memory: 1000Mi
+          requests:
+            cpu: 200m
+            memory: 1000Mi
+      terminationGracePeriodSeconds: 300
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      partition: 1
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: main-api-service
+spec:
+  selector:
+    app: main-api-service
+  ports:
+  - port: 8081
+    targetPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: main-api-service-headless
+spec:
+  selector:
+    app: main-api-service
+  clusterIP: None
+  ports:
+  - port: 8081
+    targetPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: main-api-service-nodeport
+spec:
+  selector:
+    app: main-api-service
+  ports:
+  - port: 8080
+    targetPort: 8080
+    protocol: TCP
+    nodePort: 30080
+  sessionAffinity: None
+  type: NodePort
+

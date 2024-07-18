@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uplion-admin-panel
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: uplion-admin-panel
+  template:
+    metadata:
+      labels:
+        app: uplion-admin-panel
+    spec:
+      serviceAccountName: uplion-admin-panel-sa
+      containers:
+      - name: uplion-admin-panel
+        image: youxam/uplion-admin-panel:latest
+        ports:
+        - containerPort: 3000
+        env:
+        - name: DATABASE_URL
+          value: "postgres://admin:password@postgres.postgresql.svc.cluster.local:5432/uplion?schema=public"
+        - name: IMAGE
+          value: "yiwencai/workernode:latest"

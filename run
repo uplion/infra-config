@@ -1,26 +1,60 @@
 #!/bin/bash
 # rm terraform.tfstate*
-terraform init
-if [ $? -ne 0 ]; then
-  echo "Terraform initialization failed."
-  exit 1
-fi
-echo "Terraform initialization successful."
+if $1 -eq "terraform"; then
+    terraform init
+    if [ $? -ne 0 ]; then
+    echo "Terraform initialization failed."
+    exit 1
+    fi
+    echo "Terraform initialization successful."
 
-terraform validate
-if [ $? -ne 0 ]; then
-  echo "Terraform validation failed."
-  exit 1
-fi
-echo "Terraform validation successful."
+    terraform validate
+    if [ $? -ne 0 ]; then
+    echo "Terraform validation failed."
+    exit 1
+    fi
+    echo "Terraform validation successful."
 
-while true; do
-  terraform apply -auto-approve
-  if [ $? -eq 0 ]; then
-    echo "Terraform apply successful."
-    break
-  else
-    echo "Terraform apply failed. Retrying in 1 second..."
-    sleep 1
-  fi
-done
+    while true; do
+    terraform apply -auto-approve
+    if [ $? -eq 0 ]; then
+        echo "Terraform apply successful."
+        break
+    else
+        echo "Terraform apply failed. Retrying in 1 second..."
+        sleep 1
+    fi
+    done
+else if $1 -eq "demo"; then
+    # pulsar
+    cd modules/pulsar
+    ./scripts/pulsar/prepare_helm_release.sh -n pulsar -k pulsar-local -c
+    helm repo add apache https://pulsar.apache.org/charts
+    helm repo update
+    helm install pulsar apache/pulsar --timeout 10m -f demo/pulsar-values.yaml
+
+    # PostgreSQL
+    kubectl apply -k demo/postgresql
+
+    # Admin Panel
+    kubectl apply -k demo/admin-panel
+
+    # Frontend
+    kubectl apply -f demo/frontend.yaml
+
+    # Main API Service
+    kubectl apply -f demo/main_api_service.yaml
+
+    # AI Model Operator
+    kubectl apply -k kustomize/ai-model-operator/default
+
+    # AI Model Example
+    kubectl apply -f demo/aimodel_test.yaml
+
+    # Ingress Gateway
+    kubectl apply -k kustomize/ingress-gateway
+
+else
+    echo "Invalid command."
+    exit 1
+fi

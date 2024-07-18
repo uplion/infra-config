@@ -196,19 +196,19 @@ module "postgresql_ha" {
 ################################################################################
 # Pulsar
 ################################################################################
-module "pulsar" {
-  source     = "./modules/pulsar"
-  depends_on = [module.local_path_provisioner]
+# module "pulsar" {
+#   source     = "./modules/pulsar"
+#   depends_on = [module.local_path_provisioner]
 
-  cluster_id     = module.eks.cluster_id
-  cluster_name   = module.eks.cluster_name
-  cluster_region = var.region
+#   cluster_id     = module.eks.cluster_id
+#   cluster_name   = module.eks.cluster_name
+#   cluster_region = var.region
 
-  # using default values
-  name               = "pulsar-local"
-  namespace          = "pulsar"
-  storage_class_name = "local-path"
-}
+#   # using default values
+#   name               = "pulsar-local"
+#   namespace          = "pulsar"
+#   storage_class_name = "local-path"
+# }
 
 # module "pulsar_operator" {
 #   source = "./operators/pulsar_operator"
@@ -304,8 +304,8 @@ locals {
 }
 
 module "main_api_service" {
-  source     = "./modules/main_api_service"
-  depends_on = [module.pulsar]
+  source = "./modules/main_api_service"
+  #   depends_on = [module.pulsar]
 
   replicas           = 3
   pulsar_url         = local.pulsar_url

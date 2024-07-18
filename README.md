@@ -74,6 +74,9 @@ terraform apply -auto-approve
 > [!WARNING]
 > The application may be failed, and in that case, you can just run `terraform apply -auto-approve` again to fix the issue in most scenarios.
 
+> [!NOTE]
+> If you don't want to input commands every step, you can just run `./run terraform` as a one-time short-cut. And for people don't want to wait slow~slow~slow terraform to apply, you can also run `./run demo` to quickly set-up a demo at any environment you want (e.g. minikube) with cluster and nodes prepared.
+
 ### Destroy
 
 Destroy the resources to avoid unnecessary charges.

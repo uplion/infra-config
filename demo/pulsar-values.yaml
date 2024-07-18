@@ -1,0 +1,31 @@
+namespace: pulsar
+namespaceCreate: true
+volumes:
+  persistence: false
+affinity:
+  anti_affinity: false
+components:
+  # zookeeper
+  zookeeper: true
+  # bookkeeper
+  bookkeeper: true
+  # bookkeeper - autorecovery
+  autorecovery: true
+  # broker
+  broker: true
+  # functions
+  functions: true
+  # proxy
+  proxy: true
+  # toolset
+  toolset: true
+  # pulsar manager
+  pulsar_manager: true
+zookeeper:
+  replicaCount: 1
+bookkeeper:
+  replicaCount: 1
+broker:
+  replicaCount: 1
+proxy:
+  replicaCount: 1

@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uplion-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: uplion-frontend
+  template:
+    metadata:
+      labels:
+        app: uplion-frontend
+    spec:
+      containers:
+      - name: uplion-frontend
+        image: youxam/uplion-frontend:latest
+        ports:
+        - containerPort: 3000
+        env:
+        - name: OPENAI_BASE_URL
+          value: "http://main-api-service.default.svc.cluster.local:8081/api/v1"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: uplion-frontend-nodeport-service
+spec:
+  selector:
+    app: uplion-frontend
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
+      nodePort: 30009
+  type: NodePort
