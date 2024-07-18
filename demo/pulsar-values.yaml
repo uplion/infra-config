@@ -1,5 +1,5 @@
 namespace: pulsar
-namespaceCreate: true
+# namespaceCreate: true
 volumes:
   persistence: false
 affinity:
