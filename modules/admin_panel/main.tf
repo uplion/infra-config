@@ -110,7 +110,12 @@ resource "kubernetes_deployment_v1" "admin_panel" {
 
           env {
             name  = "DATABASE_URL"
-            value = "postgresql://${var.postgres_config.username}:${var.postgres_config.password}@${var.postgres_config.host}:${var.postgres_config.port}/${var.postgres_config.dbname}?schema=public"
+            value = "postgresql://${var.postgres_config.username}:${urlencode(var.postgres_config.password)}@${var.postgres_config.host}:${var.postgres_config.port}/${var.postgres_config.dbname}?schema=public"
+          }
+
+          env {
+            name  = "IMAGE"
+            value = "yiwencai/uplion-worker-node-go:latest"
           }
 
           #   liveness_probe {

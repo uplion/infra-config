@@ -1,6 +1,5 @@
 #!/bin/bash
-rm terraform.tfstate*
-
+# rm terraform.tfstate*
 terraform init
 if [ $? -ne 0 ]; then
   echo "Terraform initialization failed."

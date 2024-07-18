@@ -48,11 +48,11 @@ spec:
         host: main-api-service.main-api-service.svc.cluster.local # TODO: Update this to user-defined
         port:
           number: 80
-  - match:
-    - uri:
-        exact: /chat
-    route:
-    - destination:
-        host: frontend.frontend.svc.cluster.local # TODO: update this to user-defined
-        port:
-          number: 80
+  # - match:
+  #   - uri:
+  #       exact: /chat
+  #   route:
+  #   - destination:
+  #       host: frontend.frontend.svc.cluster.local # TODO: update this to user-defined
+  #       port:
+  #         number: 80
