@@ -8,7 +8,7 @@ You must have the following tools installed and available in your `PATH`:
 
 - [terraform](https://developer.hashicorp.com/terraform/install)
 - [aws-cli](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) - `aws` command
-- [kubectl](https://kubernetes.io/docs/tasks/tools/) - If you want to interact with the cluster
+- [kubectl](https://kubernetes.io/docs/tasks/tools/)
 - [jq](https://jqlang.github.io/jq/) - If you are using the AWS Academy Learner Lab & get the `role_arn` by command line
 - [helm](https://helm.sh/zh/docs/intro/quickstart/)
 
@@ -23,7 +23,6 @@ aws configure
 
 or paste credentials in `~/.aws/credentials` file.
 
-
 ### Get `role_arn`
 
 #### If you are using the AWS Academy Learner Lab
@@ -31,10 +30,13 @@ or paste credentials in `~/.aws/credentials` file.
 If you are using the AWS Academy Learner Lab, I assume you have a role called `LabRole` that has the required permissions. So you can save the role ARN in `terraform.tfvars` with the following command:
 
 Bash:
+
 ```bash
 echo "role_arn = \"`aws iam get-role --role-name LabRole | jq -r .Role.Arn`\"" | tee terraform.tfvars
 ```
+
 Powershell:
+
 ```powershell
 echo "role_arn = `"$(aws iam get-role --role-name LabRole | jq -r .Role.Arn)`"" | tee terraform.tfvars
 ```
@@ -75,7 +77,7 @@ terraform apply -auto-approve
 > The application may be failed, and in that case, you can just run `terraform apply -auto-approve` again to fix the issue in most scenarios.
 
 > [!NOTE]
-> If you don't want to input commands every step, you can just run `./run terraform` as a one-time short-cut. And for people don't want to wait slow~slow~slow terraform to apply, you can also run `./run demo` to quickly set-up a demo at any environment you want (e.g. minikube) with cluster and nodes prepared.
+> If you don't want to input commands every step, you can just run `./run.sh terraform` as a one-time short-cut. And for people don't want to wait slow~slow~slow terraform to apply, you can also run `./run.sh demo` to quickly set-up a demo at any environment you want (e.g. minikube) with cluster and nodes prepared.
 
 ### Destroy
 
@@ -84,7 +86,8 @@ Destroy the resources to avoid unnecessary charges.
 ```bash
 terraform destroy -auto-approve
 ```
-<!-- 
+
+<!--
 ## Partial Tests
 
 ### Istio
@@ -198,7 +201,7 @@ postgres=> \dconfig
 
 You should see the postgres configurations on the remote.
 
-### Pulsar 
+### Pulsar
 TODO to be tested
 
 0. Prerequirity: [pulsarcli](https://github.com/streamnative/pulsarctl)
@@ -213,7 +216,7 @@ kubectl port-forward svc/pulsar-local-proxy -n pulsar 6650:6650
 > [!WARNING]
 > If you are running pulsar or other device at local, do not use the same port since the traffic will collid and redirect to somewhere you don't mean it to be.
 
-2. Then you can access pulsar service 
+2. Then you can access pulsar service
 
 ```bash
 pulsarctl topic list
@@ -227,7 +230,7 @@ TODO add main-api-service test
 
 ### AI Model Operator
 
-- See Lab Test Video 
+- See Lab Test Video
 TODO to be configured
 
 ### Admin Panel
@@ -274,4 +277,4 @@ TODO add ingress gateway test
 
 ## License
 
-MIT
+[MIT](LICENSE)
