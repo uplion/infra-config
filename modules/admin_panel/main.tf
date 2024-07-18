@@ -35,29 +35,27 @@ resource "kubernetes_service_account_v1" "admin_panel" {
   }
 }
 
-resource "kubernetes_role_v1" "admin_panel" {
+resource "kubernetes_cluster_role_v1" "admin_panel" {
   metadata {
-    name      = var.name
-    namespace = kubernetes_namespace_v1.admin_panel.metadata.0.name
+    name = var.name
   }
 
   rule {
     api_groups = ["model.youxam.com"]
-    resources  = ["aimodel"]
-    verbs      = ["*"]
+    resources  = ["aimodels"]
+    verbs      = ["list", "create", "get", "update", "delete", "watch"]
   }
 }
 
-resource "kubernetes_role_binding_v1" "admin_panel" {
+resource "kubernetes_cluster_role_binding_v1" "admin_panel" {
   metadata {
-    name      = var.name
-    namespace = kubernetes_namespace_v1.admin_panel.metadata.0.name
+    name = var.name
   }
 
   role_ref {
     api_group = "rbac.authorization.k8s.io"
-    kind      = "Role"
-    name      = kubernetes_role_v1.admin_panel.metadata.0.name
+    kind      = "ClusterRole"
+    name      = kubernetes_cluster_role_v1.admin_panel.metadata.0.name
   }
 
   subject {
