@@ -57,7 +57,6 @@ resource "kubernetes_stateful_set_v1" "main_api_services" {
 
           port {
             container_port = 8080
-            host_port      = 8080
           }
 
           resources { # TODO to be configured

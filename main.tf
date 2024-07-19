@@ -68,7 +68,7 @@ module "eks" {
 
   node_instance_types = ["c5a.xlarge"]
   node_group_scaling_config = {
-    desired_size = 10
+    desired_size = 15
     max_size     = 15
     min_size     = 5
   }
@@ -196,19 +196,19 @@ module "postgresql_ha" {
 ################################################################################
 # Pulsar
 ################################################################################
-# module "pulsar" {
-#   source     = "./modules/pulsar"
-#   depends_on = [module.local_path_provisioner]
+module "pulsar" {
+  source     = "./modules/pulsar"
+  depends_on = [module.local_path_provisioner]
 
-#   cluster_id     = module.eks.cluster_id
-#   cluster_name   = module.eks.cluster_name
-#   cluster_region = var.region
+  cluster_id     = module.eks.cluster_id
+  cluster_name   = module.eks.cluster_name
+  cluster_region = var.region
 
-#   # using default values
-#   name               = "pulsar-local"
-#   namespace          = "pulsar"
-#   storage_class_name = "local-path"
-# }
+  # using default values
+  name               = "pulsar-local"
+  namespace          = "pulsar"
+  storage_class_name = "local-path"
+}
 
 # module "pulsar_operator" {
 #   source = "./operators/pulsar_operator"
@@ -253,7 +253,7 @@ data "kustomization_build" "ingress_gateway_data" {
 
 module "ingress_gateway" {
   source     = "./modules/kustomization_apply"
-  depends_on = [module.main_api_service, data.kustomization_build.ingress_gateway_data]
+  depends_on = [data.kustomization_build.ingress_gateway_data]
   providers  = { kustomization = kustomization }
 
   ids_prio  = data.kustomization_build.ingress_gateway_data.ids_prio
@@ -262,8 +262,8 @@ module "ingress_gateway" {
 
 data "kubernetes_service_v1" "ingress_gateway" {
   metadata {
-    name      = "istio-ingressgateway"
-    namespace = "istio-system"
+    name      = "istio-ingress"
+    namespace = "istio-ingress"
   }
   depends_on = [module.ingress_gateway]
 }
@@ -307,7 +307,7 @@ module "main_api_service" {
   source = "./modules/main_api_service"
   #   depends_on = [module.pulsar]
 
-  replicas           = 30
+  replicas           = 3
   pulsar_url         = local.pulsar_url
   storage_class_name = "local-path"
 
@@ -353,11 +353,11 @@ module "admin_panel" {
 
 module "frontend" {
   source     = "./modules/frontend"
-  depends_on = [module.main_api_service]
+  depends_on = [module.eks]
 
   name      = "frontend"
   namespace = "frontend"
-  replicas  = 3
+  replicas  = 30
   resource = {
     cpu    = "100m"
     memory = "256Mi"
