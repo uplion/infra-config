@@ -1,6 +1,9 @@
 resource "kubernetes_namespace" "local_path_storage" {
   metadata {
     name = "local-path-storage"
+    labels = {
+      istio-injection = "enabled"
+    }
   }
 }
 

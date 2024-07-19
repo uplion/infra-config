@@ -3,6 +3,7 @@ kind: Namespace
 metadata:
   labels:
     control-plane: controller-manager
+    istio-injection: enabled
     app.kubernetes.io/name: namespace
     app.kubernetes.io/instance: system
     app.kubernetes.io/component: manager
@@ -90,8 +91,8 @@ spec:
           initialDelaySeconds: 5
           periodSeconds: 10
         envFrom:
-          - secretRef:
-              name: manager-secret
+        - secretRef:
+            name: manager-secret
         resources:
           limits:
             cpu: 500m

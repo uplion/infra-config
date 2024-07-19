@@ -196,47 +196,39 @@ module "postgresql_ha" {
 ################################################################################
 # Pulsar
 ################################################################################
-# module "pulsar" {
-#   source     = "./modules/pulsar"
-#   depends_on = [module.local_path_provisioner]
+module "pulsar" {
+  source     = "./modules/pulsar"
+  depends_on = [module.local_path_provisioner]
 
-#   cluster_id     = module.eks.cluster_id
-#   cluster_name   = module.eks.cluster_name
-#   cluster_region = var.region
+  cluster_id     = module.eks.cluster_id
+  cluster_name   = module.eks.cluster_name
+  cluster_region = var.region
 
-#   # using default values
-#   name               = "pulsar-local"
-#   namespace          = "pulsar"
-#   storage_class_name = "local-path"
-# }
-
-# module "pulsar_operator" {
-#   source = "./operators/pulsar_operator"
-#   depends_on = [
-#     module.eks,
-#     module.local_path_provisioner,
-#     helm_release.cert_manager,
-#     module.pulsar
-#   ]
-
-#   # using default values
-#   name      = "pulsar-operator"
-#   namespace = "pulsar-operator"
-# }
+  # using default values
+  name               = "pulsar-local"
+  namespace          = "pulsar"
+  storage_class_name = "local-path"
+}
 
 ################################################################################
 # KEDA
 ################################################################################
+resource "kubernetes_namespace_v1" "keda" {
+  metadata {
+    name = "keda"
+    labels = {
+      istio-injection = "enabled"
+    }
+  }
+}
 resource "helm_release" "keda" {
   name       = "keda"
+  namespace  = "keda"
   repository = "https://kedacore.github.io/charts"
   chart      = "keda"
   version    = "2.14.2"
 
-  depends_on = [module.eks]
-
-  namespace        = "keda"
-  create_namespace = true
+  depends_on = [module.eks, kubernetes_namespace_v1.keda]
 
   values = [yamlencode({
     podNamespace = "keda"
@@ -250,7 +242,6 @@ resource "helm_release" "keda" {
 data "kustomization_build" "ingress_gateway_data" {
   path = "${path.root}/kustomize/ingress-gateway"
 }
-
 module "ingress_gateway" {
   source     = "./modules/kustomization_apply"
   depends_on = [module.main_api_service, data.kustomization_build.ingress_gateway_data]
@@ -260,18 +251,17 @@ module "ingress_gateway" {
   manifests = data.kustomization_build.ingress_gateway_data.manifests
 }
 
-data "kubernetes_service_v1" "ingress_gateway" {
-  metadata {
-    name      = "istio-ingressgateway"
-    namespace = "istio-system"
-  }
-  depends_on = [module.ingress_gateway]
-}
+# data "kubernetes_service_v1" "ingress_gateway" {
+#   metadata {
+#     name      = "istio-ingressgateway"
+#     namespace = "istio-system"
+#   }
+#   depends_on = [module.ingress_gateway]
+# }
 
-
-locals {
-  root_url = "http://istio-ingressgateway.istio-system.svc.cluster.local"
-}
+# locals {
+#   root_url = "http://istio-ingressgateway.istio-system.svc.cluster.local"
+# }
 
 ################################################################################
 # AI Model Operator
@@ -287,7 +277,7 @@ module "ai_model_operator" {
     kustomization = kustomization
   }
 
-  depends_on = [data.kustomization_build.ai_model_operator_data]
+  depends_on = [data.kustomization_build.ai_model_operator_data, module.eks]
 
   ids_prio  = data.kustomization_build.ai_model_operator_data.ids_prio
   manifests = data.kustomization_build.ai_model_operator_data.manifests
@@ -304,8 +294,8 @@ locals {
 }
 
 module "main_api_service" {
-  source = "./modules/main_api_service"
-  #   depends_on = [module.pulsar]
+  source     = "./modules/main_api_service"
+  depends_on = [module.pulsar]
 
   replicas           = 30
   pulsar_url         = local.pulsar_url
@@ -321,7 +311,7 @@ module "main_api_service" {
 
 module "admin_panel" {
   source     = "./modules/admin_panel"
-  depends_on = [module.postgresql_ha]
+  depends_on = [module.postgresql_ha, module.ai_model_operator]
 
   name      = "admin-panel"
   namespace = "admin-panel"

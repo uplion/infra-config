@@ -60,6 +60,33 @@ data "aws_eks_cluster_auth" "main" {
   name = aws_eks_cluster.main.name
 }
 
+
+################################################################################
+# EC2 Instance for Pressure test
+################################################################################
+# data "aws_ami" "ubuntu" {
+#   most_recent = true
+#   owners      = ["099720109477"] # Canonical
+
+#   filter {
+#     name   = "name"
+#     values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
+#   }
+
+#   filter {
+#     name   = "virtualization-type"
+#     values = ["hvm"]
+#   }
+# }
+
+# resource "aws_instance" "bastion" {
+#   security_groups = 
+#   subnet_id     = module.vpc.private_subnets[0]
+#   tags = {
+#     Name = "bastion"
+#   }
+# }
+
 ################################################################################
 # Cluster Security Group
 # Defaults follow https://docs.aws.amazon.com/eks/latest/userguide/sec-group-reqs.html

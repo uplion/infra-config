@@ -5,6 +5,15 @@ locals {
   node_conf_storage_size = "100Mi"
 }
 
+resource "kubernetes_namespace_v1" "redis_operator" {
+  metadata {
+    name = var.namespace
+    labels = {
+      istio-injection = "enabled"
+    }
+  }
+}
+
 resource "helm_release" "redis_operator" {
   name       = var.redis_operator_name
   repository = "https://ot-container-kit.github.io/helm-charts"

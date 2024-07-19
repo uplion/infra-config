@@ -1,4 +1,12 @@
 ### Official Helm Chart
+# resource "kubernetes_namespace_v1" "pulsar" {
+#   metadata {
+#     name = var.namespace
+#     labels = {
+#       istio-injection = "enabled"
+#     }
+#   }
+# }
 resource "null_resource" "prepare_helm_release" {
   triggers = {
     cluster_id   = var.cluster_id
@@ -6,21 +14,19 @@ resource "null_resource" "prepare_helm_release" {
     region       = var.cluster_region
   }
 
+  #   depends_on = [kubernetes_namespace_v1.pulsar]
   provisioner "local-exec" {
     command = "${path.module}/scripts/pulsar/prepare_helm_release.sh -n ${var.namespace} -k ${var.name} -c"
   }
 }
 
 resource "helm_release" "pulsar" {
-  name  = var.name
-  chart = "${path.root}/charts/pulsar"
-
-  namespace         = var.namespace
-  create_namespace  = true
+  name              = var.name
+  chart             = "${path.root}/charts/pulsar"
   dependency_update = true
 
   depends_on = [null_resource.prepare_helm_release]
-  timeout    = "10m"
+  timeout    = 600
 
   values = [yamlencode({
     volumes = {

@@ -13,15 +13,23 @@ resource "random_password" "pgpool" {
   special = true
 }
 
+resource "kubernetes_namespace_v1" "postgresql_ha" {
+  metadata {
+    name = var.namespace
+    labels = {
+      istio-injection = "enabled"
+    }
+  }
+}
+
 resource "helm_release" "postgresql_ha" {
   name       = var.name
+  namespace  = var.namespace
   repository = "oci://registry-1.docker.io/bitnamicharts"
   chart      = "postgresql-ha"
   version    = "14.2.11"
 
-  namespace        = var.namespace
-  create_namespace = true
-
+  depends_on = [kubernetes_namespace_v1.postgresql_ha]
   set {
     name  = "postgresql.password"
     value = "GO)Ns6]Tp3Z$TbW1"

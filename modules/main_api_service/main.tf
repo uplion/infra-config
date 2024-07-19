@@ -5,6 +5,9 @@ locals {
 resource "kubernetes_namespace_v1" "main_api_service" {
   metadata {
     name = var.namespace
+    labels = {
+      istio-injection = "enabled"
+    }
   }
 }
 

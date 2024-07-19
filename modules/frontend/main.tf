@@ -1,6 +1,9 @@
 resource "kubernetes_namespace_v1" "frontend" {
   metadata {
     name = var.namespace
+    labels = {
+      istio-injection = "enabled"
+    }
   }
 }
 
