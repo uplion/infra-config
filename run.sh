@@ -76,10 +76,9 @@ elif [ $1 == "demo" ]; then
     # Admin Panel
     kubectl apply -k demo/admin-panel
 
-    namespace="pulsar"
+
 
     interval=5
-    elapsed_time=0
     check_statefulsets_ready() {
         local statefulsets_ready=true
         mapfile -t statefulsets < <(kubectl get statefulset -n "$namespace" -o jsonpath='{range .items[*]}{.metadata.name} {.status.readyReplicas}{"\n"}{end}')
@@ -96,12 +95,69 @@ elif [ $1 == "demo" ]; then
         echo "$statefulsets_ready"
     }
 
+    check_deployments_ready() {
+        local deployment_ready=true
+        mapfile -t deployments < <(kubectl get deployments -A -o jsonpath='{range .items[*]}{.metadata.name} {.status.readyReplicas}{"\n"}{end}')
+        for deployment in "${deployments[@]}"; do
+            name=$(echo "$deployment" | awk '{print $1}')
+            ready_replicas=$(echo "$deployment" | awk '{print $2}')
+    
+            if [[ -z "$ready_replicas" || "$ready_replicas" -lt 1 ]]; then
+                deployment_ready=false
+                break
+            fi
+        done
+        
+        echo "$deployment_ready"
+    }
+
+    elapsed_time=0
+    namespace="pulsar"
     while true; do
     if [[ $(check_statefulsets_ready) == true ]]; then
         echo "Pulsar are READY. Time elapsed: ${elapsed_time} seconds."
         break
     else
         echo "Waiting for pulsar to become READY... Time elapsed: ${elapsed_time} seconds."
+        sleep "$interval"
+        elapsed_time=$((elapsed_time + interval))
+    fi
+    done
+
+    elapsed_time=0
+    namespace="redis-operator"
+    while true; do
+    if [[ $(check_statefulsets_ready) == true ]]; then
+        echo "Redis are READY. Time elapsed: ${elapsed_time} seconds."
+        break
+    else
+        echo "Waiting for pulsar to become READY... Time elapsed: ${elapsed_time} seconds."
+        sleep "$interval"
+        elapsed_time=$((elapsed_time + interval))
+    fi
+    done
+
+    elapsed_time=0
+    namespace="postgresql-ha"
+    while true; do
+    if [[ $(check_statefulsets_ready) == true && $(check_deployments_ready) == true ]]; then
+        echo "PostgreSQL are READY. Time elapsed: ${elapsed_time} seconds."
+        break
+    else
+        echo "Waiting for postgresql to become READY... Time elapsed: ${elapsed_time} seconds."
+        sleep "$interval"
+        elapsed_time=$((elapsed_time + interval))
+    fi
+    done
+
+    elapsed_time=0
+    namespace="keda"
+    while true; do
+    if [[ $(check_deployments_ready) == true ]]; then
+        echo "KEDA are READY. Time elapsed: ${elapsed_time} seconds."
+        break
+    else
+        echo "Waiting for postgresql to become READY... Time elapsed: ${elapsed_time} seconds."
         sleep "$interval"
         elapsed_time=$((elapsed_time + interval))
     fi
