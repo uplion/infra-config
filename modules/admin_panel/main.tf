@@ -1,6 +1,9 @@
 resource "kubernetes_namespace_v1" "admin_panel" {
   metadata {
     name = var.namespace
+    labels = {
+      istio-injection = "enabled"
+    }
   }
 }
 
