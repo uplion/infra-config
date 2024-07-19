@@ -68,9 +68,9 @@ module "eks" {
 
   node_instance_types = ["c5a.xlarge"]
   node_group_scaling_config = {
-    desired_size = 15
-    max_size     = 15
-    min_size     = 5
+    desired_size = 9
+    max_size     = 10
+    min_size     = 1
   }
 
   #  EKS K8s API cluster needs to be able to talk with the EKS worker nodes with port 15017/TCP and 15012/TCP which is used by Istio
@@ -304,10 +304,10 @@ locals {
 }
 
 module "main_api_service" {
-  source = "./modules/main_api_service"
-  #   depends_on = [module.pulsar]
+  source     = "./modules/main_api_service"
+  depends_on = [module.pulsar]
 
-  replicas           = 3
+  replicas           = 30
   pulsar_url         = local.pulsar_url
   storage_class_name = "local-path"
 
@@ -326,10 +326,10 @@ module "admin_panel" {
   name      = "admin-panel"
   namespace = "admin-panel"
   replicas  = 1
-  resource = {
-    cpu    = "100m"
-    memory = "256Mi"
-  }
+  #   resource = {
+  #     cpu    = "100m"
+  #     memory = "256Mi"
+  #   }
   postgres_config = {
     username = "postgres"
     password = "GO)Ns6]Tp3Z$TbW1"
@@ -357,11 +357,11 @@ module "frontend" {
 
   name      = "frontend"
   namespace = "frontend"
-  replicas  = 30
-  resource = {
-    cpu    = "100m"
-    memory = "256Mi"
-  }
+  replicas  = 3
+  #   resource = {
+  #     cpu    = "100m"
+  #     memory = "256Mi"
+  #   }
 
   openai_host = "main-api-service.main-api-service.svc.cluster.local"
   openai_port = 8080

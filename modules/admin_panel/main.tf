@@ -100,10 +100,10 @@ resource "kubernetes_deployment_v1" "admin_panel" {
           image = "youxam/uplion-admin-panel:latest"
           name  = "admin-panel-app"
 
-          resources {
-            limits   = var.resource
-            requests = var.resource
-          }
+          #   resources {
+          #     limits   = var.resource
+          #     requests = var.resource
+          #   }
 
           port {
             container_port = 3000

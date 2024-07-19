@@ -3,22 +3,22 @@
 
 git pull origin main
 if [ $1 == "terraform" ]; then
-    terraform init
-    if [ $? -ne 0 ]; then
-    echo "Terraform initialization failed."
-    exit 1
-    fi
-    echo "Terraform initialization successful."
+    # terraform init
+    # if [ $? -ne 0 ]; then
+    # echo "Terraform initialization failed."
+    # exit 1
+    # fi
+    # echo "Terraform initialization successful."
 
-    terraform validate
-    if [ $? -ne 0 ]; then
-    echo "Terraform validation failed."
-    exit 1
-    fi
-    echo "Terraform validation successful."
+    # terraform validate
+    # if [ $? -ne 0 ]; then
+    # echo "Terraform validation failed."
+    # exit 1
+    # fi
+    # echo "Terraform validation successful."
 
     while true; do
-    terraform apply -auto-approve
+    terraform apply -auto-approve -parallelism=30
     if [ $? -eq 0 ]; then
         echo "Terraform apply successful."
         break

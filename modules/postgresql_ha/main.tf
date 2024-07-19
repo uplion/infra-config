@@ -58,14 +58,14 @@ resource "helm_release" "postgresql_ha" {
         postgresql = {
           replicaCount = 3 # using default value
           resources = {
-            requests = {
-              cpu    = "100m"
-              memory = "128Mi"
-            }
-            limits = {
-              cpu    = "500m"
-              memory = "512Mi"
-            }
+            # requests = {
+            #   cpu    = "100m"
+            #   memory = "128Mi"
+            # }
+            # limits = {
+            #   cpu    = "500m"
+            #   memory = "512Mi"
+            # }
             password       = "GO)Ns6]Tp3Z$TbW1"
             repmgrPassword = "uae->A_{I-oygQKG"
           }

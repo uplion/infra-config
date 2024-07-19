@@ -59,17 +59,17 @@ resource "kubernetes_stateful_set_v1" "main_api_services" {
             container_port = 8080
           }
 
-          resources { # TODO to be configured
-            limits = {
-              cpu    = "200m"
-              memory = "1000Mi"
-            }
+          #   resources { # TODO to be configured
+          #     limits = {
+          #       cpu    = "200m"
+          #       memory = "1000Mi"
+          #     }
 
-            requests = {
-              cpu    = "200m"
-              memory = "1000Mi"
-            }
-          }
+          #     requests = {
+          #       cpu    = "200m"
+          #       memory = "1000Mi"
+          #     }
+          #   }
 
           #   volume_mount {
           #     name       = "config-volume"
