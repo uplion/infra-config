@@ -75,7 +75,6 @@ resource "kubernetes_deployment_v1" "frontend" {
 
           port {
             container_port = 3000
-            host_port      = 3000
           }
 
           env {

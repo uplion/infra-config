@@ -66,11 +66,11 @@ module "eks" {
     # aws-ebs-csi-driver     = {}
   }
 
-  node_instance_types = ["c5a.xlarge"]
+  node_instance_types = ["t3.medium"]
   node_group_scaling_config = {
-    desired_size = 10
-    max_size     = 15
-    min_size     = 5
+    desired_size = 6
+    max_size     = 9
+    min_size     = 1
   }
 
   #  EKS K8s API cluster needs to be able to talk with the EKS worker nodes with port 15017/TCP and 15012/TCP which is used by Istio
@@ -210,6 +210,20 @@ module "pulsar" {
   storage_class_name = "local-path"
 }
 
+# module "pulsar_operator" {
+#   source = "./operators/pulsar_operator"
+#   depends_on = [
+#     module.eks,
+#     module.local_path_provisioner,
+#     helm_release.cert_manager,
+#     module.pulsar
+#   ]
+
+#   # using default values
+#   name      = "pulsar-operator"
+#   namespace = "pulsar-operator"
+# }
+
 ################################################################################
 # KEDA
 ################################################################################
@@ -244,20 +258,20 @@ data "kustomization_build" "ingress_gateway_data" {
 }
 module "ingress_gateway" {
   source     = "./modules/kustomization_apply"
-  depends_on = [module.main_api_service, data.kustomization_build.ingress_gateway_data]
+  depends_on = [data.kustomization_build.ingress_gateway_data]
   providers  = { kustomization = kustomization }
 
   ids_prio  = data.kustomization_build.ingress_gateway_data.ids_prio
   manifests = data.kustomization_build.ingress_gateway_data.manifests
 }
 
-# data "kubernetes_service_v1" "ingress_gateway" {
-#   metadata {
-#     name      = "istio-ingressgateway"
-#     namespace = "istio-system"
-#   }
-#   depends_on = [module.ingress_gateway]
-# }
+data "kubernetes_service_v1" "ingress_gateway" {
+  metadata {
+    name      = "istio-ingress"
+    namespace = "istio-ingress"
+  }
+  depends_on = [module.ingress_gateway]
+}
 
 # locals {
 #   root_url = "http://istio-ingressgateway.istio-system.svc.cluster.local"
@@ -297,7 +311,7 @@ module "main_api_service" {
   source     = "./modules/main_api_service"
   depends_on = [module.pulsar]
 
-  replicas           = 30
+  replicas           = 3
   pulsar_url         = local.pulsar_url
   storage_class_name = "local-path"
 
@@ -316,10 +330,10 @@ module "admin_panel" {
   name      = "admin-panel"
   namespace = "admin-panel"
   replicas  = 1
-  resource = {
-    cpu    = "100m"
-    memory = "256Mi"
-  }
+  #   resource = {
+  #     cpu    = "100m"
+  #     memory = "256Mi"
+  #   }
   postgres_config = {
     username = "postgres"
     password = "GO)Ns6]Tp3Z$TbW1"
@@ -343,15 +357,15 @@ module "admin_panel" {
 
 module "frontend" {
   source     = "./modules/frontend"
-  depends_on = [module.main_api_service]
+  depends_on = [module.eks]
 
   name      = "frontend"
   namespace = "frontend"
   replicas  = 3
-  resource = {
-    cpu    = "100m"
-    memory = "256Mi"
-  }
+  #   resource = {
+  #     cpu    = "100m"
+  #     memory = "256Mi"
+  #   }
 
   openai_host = "main-api-service.main-api-service.svc.cluster.local"
   openai_port = 8080

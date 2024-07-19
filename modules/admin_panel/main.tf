@@ -100,14 +100,13 @@ resource "kubernetes_deployment_v1" "admin_panel" {
           image = "youxam/uplion-admin-panel:latest"
           name  = "admin-panel-app"
 
-          resources {
-            limits   = var.resource
-            requests = var.resource
-          }
+          #   resources {
+          #     limits   = var.resource
+          #     requests = var.resource
+          #   }
 
           port {
             container_port = 3000
-            host_port      = 3000
           }
 
           env {
@@ -117,18 +116,18 @@ resource "kubernetes_deployment_v1" "admin_panel" {
 
           env {
             name  = "IMAGE"
-            value = "yiwencai/uplion-worker-node-go:latest"
+            value = "yiwencai/workernode:latest"
           }
 
           env {
             name  = "REPLICAS"
-            value = 30
+            value = 3
           }
 
-          #   env {
-          #     name  = "MSG_BACKLOG_THRESHOLD"
-          #     value = 2
-          #   }
+          env {
+            name  = "MSG_BACKLOG_THRESHOLD"
+            value = 2
+          }
 
           #   liveness_probe {
           #     http_get {
