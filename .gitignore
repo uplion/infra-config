@@ -33,3 +33,5 @@ override.tf.json
 .DS_Store
 
 tmp
+modules/pulsar/PRIVATEKEY
+modules/pulsar/PUBLICKEY
