@@ -54,9 +54,6 @@ elif [ $1 == "demo" ]; then
     # AI Model Operator
     kubectl apply -k kustomize/ai-model-operator/default
 
-    # AI Model Example
-    kubectl apply -f demo/aimodel_test.yaml
-
     deployment_name="postgres"
     namespace="postgresql"
     elapsed_time=0
@@ -76,8 +73,7 @@ elif [ $1 == "demo" ]; then
     # Admin Panel
     kubectl apply -k demo/admin-panel
 
-
-
+    namespace="pulsar"
     interval=5
     check_statefulsets_ready() {
         local statefulsets_ready=true
@@ -124,48 +120,41 @@ elif [ $1 == "demo" ]; then
     fi
     done
 
+    namespace="default"
+    interval=5
     elapsed_time=0
-    namespace="redis-operator"
-    while true; do
-    if [[ $(check_statefulsets_ready) == true ]]; then
-        echo "Redis are READY. Time elapsed: ${elapsed_time} seconds."
-        break
-    else
-        echo "Waiting for pulsar to become READY... Time elapsed: ${elapsed_time} seconds."
-        sleep "$interval"
-        elapsed_time=$((elapsed_time + interval))
-    fi
-    done
 
-    elapsed_time=0
-    namespace="postgresql-ha"
-    while true; do
-    if [[ $(check_statefulsets_ready) == true && $(check_deployments_ready) == true ]]; then
-        echo "PostgreSQL are READY. Time elapsed: ${elapsed_time} seconds."
-        break
-    else
-        echo "Waiting for postgresql to become READY... Time elapsed: ${elapsed_time} seconds."
-        sleep "$interval"
-        elapsed_time=$((elapsed_time + interval))
-    fi
-    done
+    check_pods_ready() {
+        local pods_ready=true
+        mapfile -t pods < <(kubectl get pod -n "$namespace" -o jsonpath='{range .items[*]}{.metadata.name} {.status.phase}{"\n"}{end}')
+        for pod in "${pods[@]}"; do
+            name=$(echo "$pod" | awk '{print $1}')
+            status=$(echo "$pod" | awk '{print $2}')
 
-    elapsed_time=0
-    namespace="keda"
+            if [[ "$status" != "Running" ]]; then
+                pods_ready=false
+                break
+            fi
+        done
+        
+        echo "$pods_ready"
+    }
+
     while true; do
-    if [[ $(check_deployments_ready) == true ]]; then
-        echo "KEDA are READY. Time elapsed: ${elapsed_time} seconds."
-        break
-    else
-        echo "Waiting for postgresql to become READY... Time elapsed: ${elapsed_time} seconds."
-        sleep "$interval"
-        elapsed_time=$((elapsed_time + interval))
-    fi
+        if [[ $(check_pods_ready) == true ]]; then
+            echo "All Pods are READY. Time elapsed: ${elapsed_time} seconds."
+            break
+        else
+            echo "Waiting for Pods to become READY... Time elapsed: ${elapsed_time} seconds."
+            sleep "$interval"
+            elapsed_time=$((elapsed_time + interval))
+        fi
     done
 
     echo "UPLION demo is ready."
     echo -e "\tAdmin Panel: http://<NodeIP>:30008/admin"
     echo -e "\tFrontend: http://<NodeIP>:30009"
+    echo -e "\tAPI: http://<NodeIP>:30080/api/v1/chat/completion"
 
 else
     echo "Invalid command: $1"
