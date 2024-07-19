@@ -79,16 +79,16 @@ resource "helm_release" "redis_cluster" {
     # imagePullSecrets = [] # List of image pull secrets, in case redis image is getting pull from private registry
     redisCluster = {
       clusterSize = var.redis_cluster_size # Size of the redis cluster leader and follower nodes
-      resources = {
-        limits = {
-          cpu    = "500m"  # CPU limit for redis pods
-          memory = "500Mi" # Memory limit for redis pods
-        }
-        requests = {
-          cpu    = "500m"  # CPU request for redis pods
-          memory = "500Mi" # Memory request for redis pods
-        }
-      }
+      #   resources = {
+      #     limits = {
+      #       cpu    = "500m"  # CPU limit for redis pods
+      #       memory = "500Mi" # Memory limit for redis pods
+      #     }
+      #     requests = {
+      #       cpu    = "500m"  # CPU request for redis pods
+      #       memory = "500Mi" # Memory request for redis pods
+      #     }
+      #   }
       #   clusterVersion      = "v7"                    # Major version of Redis setup, values can be v6 or v7
       #   persistenceEnabled  = true                    # Persistence should be enabled or not in the Redis cluster setup
       #   secretName          = "redis-secret"          # Name of the existing secret in Kubernetes
